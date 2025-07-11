@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voting Age Checker</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin-top: 50px; }
+    input, button { padding: 10px; margin: 10px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Voting Age Checker</h1>
+  <input type="number" id="age" placeholder="Enter your age">
+  <button onclick="checkAge()">Check</button>
+  <p id="result"></p>
+
+  <script>
+    async function checkAge() {
+      const age = document.getElementById("age").value;
+      const res = await fetch("/check_age", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ age: parseInt(age) })
+      });
+      const data = await res.json();
+      document.getElementById("result").innerText = data.message;
+    }
+  </script>
+</body>
+</html>
