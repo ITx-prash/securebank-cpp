@@ -1815,4 +1815,11 @@ CMakeFiles/crow_bank_app.dir/main.cpp.obj: \
  /usr/x86_64-w64-mingw32/include/boost/date_time/time_facet.hpp \
  /usr/x86_64-w64-mingw32/include/boost/date_time/posix_time/conversion.hpp \
  /usr/x86_64-w64-mingw32/include/boost/date_time/filetime_functions.hpp \
- /usr/x86_64-w64-mingw32/include/boost/date_time/posix_time/time_parsers.hpp
+ /usr/x86_64-w64-mingw32/include/boost/date_time/posix_time/time_parsers.hpp \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/filesystem \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/bits/fs_fwd.h \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/bits/fs_path.h \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/codecvt \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/bits/fs_dir.h \
+ /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/bits/fs_ops.h \
+ /usr/share/mingw-w64/include/shellapi.h

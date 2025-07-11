@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = @CMakeFiles/crow_bank_app.dir/includes_CXX.rsp
 
-CXX_FLAGS =  -static-libgcc -static-libstdc++ -std=gnu++17
+CXX_FLAGS =  -static-libgcc -static-libstdc++ -O3 -DNDEBUG -std=gnu++17
 

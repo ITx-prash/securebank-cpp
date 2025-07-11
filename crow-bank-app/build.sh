@@ -1,29 +1,38 @@
 #!/bin/bash
-# Comprehensive build and deploy script
+# Unified build script for Crow Bank App
+
+# Configuration
+SHARED_FOLDER="/home/prash/Desktop/Windows_Share"
+VM_NAME="win10"
+DEPLOY_DIR="$SHARED_FOLDER/crow-bank-app"
 
 usage() {
     echo "Usage: $0 [linux|windows|both] [options]"
     echo ""
     echo "Platforms:"
-    echo "  linux    - Build for Linux (quick development testing)"
-    echo "  windows  - Build for Windows and deploy to shared folder"
+    echo "  linux    - Build and run for Linux (development)"
+    echo "  windows  - Build for Windows, deploy to shared folder, and start VM"
     echo "  both     - Build for both platforms"
     echo ""
     echo "Options:"
-    echo "  --run-vm    - Start Windows VM after Windows build"
-    echo "  --clean     - Clean build directories before building"
-    echo "  --help      - Show this help message"
+    echo "  --no-vm       - Skip starting Windows VM after Windows build"
+    echo "  --no-clean    - Skip cleaning build directories (faster, but less reliable)"
+    echo "  --help        - Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 linux                    # Quick Linux build and test"
-    echo "  $0 windows --run-vm         # Build for Windows and start VM"
-    echo "  $0 both --clean             # Clean build both platforms"
+    echo "  $0 linux                      # Clean Linux build (recommended)"
+    echo "  $0 linux --no-clean          # Quick incremental Linux build"
+    echo "  $0 windows                    # Clean Windows build and start VM (default)"
+    echo "  $0 windows --no-vm            # Clean Windows build without starting VM"
+    echo "  $0 both --no-clean            # Quick incremental build both platforms"
+    echo ""
+    echo "Note: Clean builds and VM start are DEFAULT for reliability and convenience."
 }
 
 # Parse arguments
 PLATFORM=""
-RUN_VM=false
-CLEAN=false
+RUN_VM=true   # Default to starting VM for Windows builds
+CLEAN=true    # Default to clean builds for reliability
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -31,12 +40,12 @@ while [[ $# -gt 0 ]]; do
             PLATFORM="$1"
             shift
             ;;
-        --run-vm)
-            RUN_VM=true
+        --no-vm)
+            RUN_VM=false
             shift
             ;;
-        --clean)
-            CLEAN=true
+        --no-clean)
+            CLEAN=false
             shift
             ;;
         --help)
@@ -57,46 +66,142 @@ if [ -z "$PLATFORM" ]; then
     exit 1
 fi
 
-# Clean build directories if requested
+# Clean build directories by default (for reliability)
 if [ "$CLEAN" = true ]; then
-    echo "🧹 Cleaning build directories..."
+    echo "🧹 Cleaning build directories for reliable build..."
     rm -rf build-linux win-build
+else
+    echo "⚡ Using incremental build (faster but potentially less reliable)..."
 fi
 
-# Build for Linux
-if [ "$PLATFORM" = "linux" ] || [ "$PLATFORM" = "both" ]; then
+# Function to build for Linux
+build_linux() {
     echo "🐧 Building for Linux..."
-    ./build_linux.sh
-    if [ $? -ne 0 ]; then
+    
+    mkdir -p build-linux
+    cd build-linux
+    
+    cmake .. -DCMAKE_BUILD_TYPE=Debug
+    make -j$(nproc)
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Linux build successful!"
+        
+        # If only building for Linux, run the server
+        if [ "$PLATFORM" = "linux" ]; then
+            echo "🚀 Starting development server..."
+            echo "   Access at: http://localhost:8080"
+            echo "   Press Ctrl+C to stop"
+            echo ""
+            ./crow_bank_app
+            exit 0
+        fi
+        
+        cd ..
+        echo "✅ Linux build completed"
+    else
         echo "❌ Linux build failed!"
         exit 1
     fi
-    
-    # If only Linux, exit here (the script will run the server)
-    if [ "$PLATFORM" = "linux" ]; then
-        exit 0
-    fi
-    
-    echo "✅ Linux build completed"
-    echo ""
-fi
+}
 
-# Build for Windows
-if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "both" ]; then
+# Function to build for Windows
+build_windows() {
     echo "🪟 Building for Windows..."
     
-    # Modify build_windows.sh to handle VM starting
-    if [ "$RUN_VM" = true ]; then
-        # This will be handled in the Windows build script
-        export START_VM=true
-    fi
+    mkdir -p win-build
+    cd win-build
     
-    ./build_windows.sh
-    if [ $? -ne 0 ]; then
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../win-toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Windows build successful!"
+        
+        # Deploy to shared folder
+        echo "📦 Deploying to shared folder..."
+        mkdir -p "$DEPLOY_DIR"
+        
+        cp crow_bank_app.exe "$DEPLOY_DIR/"
+        cp -r ../public "$DEPLOY_DIR/"
+        
+        echo "📁 Deployed to: $DEPLOY_DIR"
+        echo "   Files: crow_bank_app.exe, public/"
+        
+        # Start VM if requested
+        if [ "$RUN_VM" = true ]; then
+            echo ""
+            echo "🚀 Starting Windows VM: $VM_NAME"
+            virsh start "$VM_NAME"
+            
+            if [ $? -eq 0 ]; then
+                echo "✅ VM started successfully."
+                echo "💤 Waiting 10s for VM to begin boot..."
+                sleep 8
+                
+                echo "🖥️ Launching viewer window..."
+                virt-viewer "$VM_NAME" &
+                
+                echo ""
+                echo "🎯 VM Instructions:"
+                echo "   1. Wait for Windows to fully boot"
+                echo "   2. Navigate to shared folder"
+                echo "   3. Run crow_bank_app.exe"
+                echo "   4. Open browser to http://localhost:8080"
+            else
+                echo "❌ Failed to start VM."
+            fi
+        fi
+        
+        cd ..
+        echo "✅ Windows build and deployment completed"
+    else
         echo "❌ Windows build failed!"
         exit 1
     fi
-fi
+}
+
+# Function to start VM only
+start_vm() {
+    echo "🚀 Starting Windows VM: $VM_NAME"
+    virsh start "$VM_NAME"
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to start VM."
+        exit 1
+    fi
+    
+    echo "✅ VM started successfully."
+    echo "💤 Waiting 10s for VM to begin boot..."
+    sleep 8
+    
+    echo "🖥️ Launching viewer window..."
+    virt-viewer "$VM_NAME" &
+    
+    echo ""
+    echo "🎯 App location: $DEPLOY_DIR/crow_bank_app.exe"
+}
+
+# Main execution
+case $PLATFORM in
+    linux)
+        build_linux
+        ;;
+    windows)
+        build_windows
+        ;;
+    both)
+        build_linux
+        echo ""
+        build_windows
+        ;;
+esac
 
 echo ""
 echo "🎉 All builds completed successfully!"
+
+# If this script is called with 'vm' as first argument, just start VM
+if [ "$1" = "vm" ]; then
+    start_vm
+    exit 0
+fi
