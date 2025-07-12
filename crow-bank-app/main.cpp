@@ -202,12 +202,12 @@ public:
     
     // Override pure virtual function from Person
     void displayInfo() const override {
-        cout << "User Info - Name: " << name << ", Email: " << email 
-             << ", Phone: " << phone << endl;
         if (account) {
             cout << "Account: " << account->getAccountNumber() 
-                 << ", Balance: $" << account->getBalance() << endl;
+                 << endl<<"Balance: $" << account->getBalance() << endl;
         }
+        cout << "User Info - \nName: " << name <<endl<< "Email: " << email 
+             <<endl<< "Phone: " << phone << endl;
     }
     
     // Method to verify password
@@ -253,6 +253,15 @@ string User::bankName = "SecureBank";
 
 //================================ UTILITY FUNCTIONS ================================
 
+// Cross-platform screen clearing function
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 string get_executable_dir() {
 #ifdef _WIN32
     char path[MAX_PATH];
@@ -274,23 +283,63 @@ string get_file_path(const string& relative_path) {
 // Cross-platform icon display
 string getIcon(const string& iconType) {
 #ifdef _WIN32
-    // Windows fallback - simple characters
-    if (iconType == "bank") return "[BANK]";
-    if (iconType == "register") return "[REG]";
-    if (iconType == "login") return "[LOGIN]";
-    if (iconType == "help") return "[HELP]";
-    if (iconType == "exit") return "[EXIT]";
-    if (iconType == "deposit") return "[DEP]";
-    if (iconType == "withdraw") return "[WITH]";
-    if (iconType == "balance") return "[BAL]";
-    if (iconType == "history") return "[HIST]";
-    if (iconType == "transfer") return "[TRANS]";
-    if (iconType == "settings") return "[SET]";
-    if (iconType == "logout") return "[OUT]";
-    if (iconType == "success") return "[OK]";
-    if (iconType == "error") return "[ERR]";
-    if (iconType == "warning") return "[WARN]";
-    return "[*]";
+    // Windows - Smart emoji detection
+    // Check for Windows Terminal or modern terminal capabilities
+    static bool useEmojis = []() {
+        // Check environment variables that indicate modern terminal
+        const char* wt_session = getenv("WT_SESSION");           // Windows Terminal
+        const char* term_program = getenv("TERM_PROGRAM");       // VS Code terminal, etc.
+        const char* colorterm = getenv("COLORTERM");             // Modern terminals
+        const char* force_emojis = getenv("FORCE_EMOJIS");       // User override
+        const char* no_emojis = getenv("NO_EMOJIS");             // User disable
+        
+        // User explicitly disabled emojis
+        if (no_emojis) return false;
+        
+        // User explicitly enabled emojis
+        if (force_emojis) return true;
+        
+        // Detect modern terminal environment
+        return (wt_session || term_program || colorterm);
+    }();
+    
+    if (useEmojis) {
+        // Unicode emojis for modern Windows terminals
+        if (iconType == "bank") return "🏦";
+        if (iconType == "register") return "📝";
+        if (iconType == "login") return "🔐";
+        if (iconType == "help") return "❓";
+        if (iconType == "exit") return "🚪";
+        if (iconType == "deposit") return "💰";
+        if (iconType == "withdraw") return "💸";
+        if (iconType == "balance") return "💳";
+        if (iconType == "history") return "📊";
+        if (iconType == "transfer") return "🔄";
+        if (iconType == "settings") return "⚙️";
+        if (iconType == "logout") return "🚪";
+        if (iconType == "success") return "✅";
+        if (iconType == "error") return "❌";
+        if (iconType == "warning") return "⚠️";
+        return "•";
+    } else {
+        // Windows fallback - basic ASCII characters only
+        if (iconType == "bank") return "";
+        if (iconType == "register") return "";
+        if (iconType == "login") return "";
+        if (iconType == "help") return "";
+        if (iconType == "exit") return "";
+        if (iconType == "deposit") return "";
+        if (iconType == "withdraw") return "";
+        if (iconType == "balance") return "";
+        if (iconType == "history") return "";
+        if (iconType == "transfer") return "";
+        if (iconType == "settings") return "";
+        if (iconType == "logout") return "";
+        if (iconType == "success") return "[OK]";
+        if (iconType == "error") return "[ERROR]";
+        if (iconType == "warning") return "[WARNING]";
+        return "";
+    }
 #else
     // Linux/Unix - Unicode emojis
     if (iconType == "bank") return "🏦";
@@ -425,19 +474,7 @@ public:
     // Constructor
     BankSystem(string name) : bankName(name) {
         // Load existing users from file
-        if (!loadUsersFromFile(users, totalUsers)) {
-            // If no file exists, create demo users
-            User demoUser("John Doe", "john@demo.com", "123-456-7890", "password123");
-            users["john@demo.com"] = demoUser;
-            totalUsers++;
-            
-            User demoUser2("Jane Smith", "jane@demo.com", "987-654-3210", "password456");
-            users["jane@demo.com"] = demoUser2;
-            totalUsers++;
-            
-            // Save demo users to file
-            saveUsersToFile(users);
-        }
+        loadUsersFromFile(users, totalUsers);
     }
     
     // Destructor - save data when system shuts down
@@ -532,39 +569,37 @@ string read_file(const string& filename) {
 
 // Main CLI authentication menu
 void displayAuthMenu() {
-    cout << "\n";
+    cout << "Made with <3\n\n";
     cout << "==============================================\n";
     cout << "        " << getIcon("bank") << " SECURE BANK CLI SYSTEM        \n";
     cout << "==============================================\n";
-    cout << "     Advanced C++ OOP Banking Platform     \n";
-    cout << "==============================================\n";
     cout << "\n";
-    cout << "1. " << getIcon("register") << " Register New Account\n";
-    cout << "2. " << getIcon("login") << " Login to Account\n";
-    cout << "3. " << getIcon("help") << " Help & OOP Concepts\n";
-    cout << "4. " << getIcon("exit") << " Exit\n";
+    cout << "1. " << getIcon("register") << "Register New Account\n";
+    cout << "2. " << getIcon("login") << "Login to Account\n";
+    cout << "3. " << getIcon("help") << "Help & OOP Concepts\n";
+    cout << "4. " << getIcon("exit") << "Exit\n";
     cout << "\n==============================================\n";
-    cout << "Select option (1-4): ";
+    cout << "\nSelect option (1-4): ";
 }
 
 // Banking dashboard menu (after login)
 void displayBankingMenu(const string& userName) {
-    cout << "\n";
+    cout << "Made with <3\n\n";
     cout << "==============================================\n";
     cout << "      " << getIcon("bank") << " WELCOME " << userName << "\n";
     cout << "==============================================\n";
     cout << "         Banking Dashboard\n";
     cout << "==============================================\n";
     cout << "\n";
-    cout << "1. " << getIcon("deposit") << " Deposit Money\n";
-    cout << "2. " << getIcon("withdraw") << " Withdraw Money\n";
-    cout << "3. " << getIcon("balance") << " Check Balance\n";
-    cout << "4. " << getIcon("history") << " Transaction History\n";
-    cout << "5. " << getIcon("transfer") << " Transfer Money\n";
-    cout << "6. " << getIcon("settings") << " Account Settings\n";
-    cout << "7. " << getIcon("logout") << " Logout\n";
+    cout << "1. " << getIcon("deposit") << "Deposit Money\n";
+    cout << "2. " << getIcon("withdraw") << "Withdraw Money\n";
+    cout << "3. " << getIcon("balance") << "Check Balance\n";
+    cout << "4. " << getIcon("history") << "Transaction History\n";
+    cout << "5. " << getIcon("transfer") << "Transfer Money\n";
+    cout << "6. " << getIcon("settings") << "Account Settings\n";
+    cout << "7. " << getIcon("logout") << "Logout\n";
     cout << "\n==============================================\n";
-    cout << "Select option (1-7): ";
+    cout << "\nSelect option (1-7): ";
 }
 
 // Registration function
@@ -574,7 +609,6 @@ bool registerNewUser(BankSystem& bank) {
     string firstName, lastName, email, phone, password, confirmPassword;
     
     cout << "Enter First Name: ";
-    cin.ignore();
     getline(cin, firstName);
     
     cout << "Enter Last Name: ";
@@ -635,7 +669,6 @@ User* loginUser(BankSystem& bank) {
     string email, password;
     
     cout << "Enter Email: ";
-    cin.ignore();
     getline(cin, email);
     
     cout << "Enter Password: ";
@@ -661,6 +694,7 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
     int choice;
     
     while (true) {
+        clearScreen(); // Clear screen for clean banking interface
         displayBankingMenu(currentUser->getName());
         
         if (!(cin >> choice)) {
@@ -676,11 +710,13 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
         
         switch (choice) {
             case 1: { // Deposit Money
+                clearScreen();
                 cout << "\n=== " << getIcon("deposit") << " DEPOSIT MONEY ===\n";
                 cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
                 cout << "Enter Amount to Deposit: $";
                 double amount;
                 cin >> amount;
+                cin.ignore(); // Clear input buffer
                 
                 if (amount > 0) {
                     if (currentUser->makeDeposit(amount)) {
@@ -693,15 +729,19 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 } else {
                     cout << getIcon("error") << " Invalid amount!\n";
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 2: { // Withdraw Money
+                clearScreen();
                 cout << "\n=== " << getIcon("withdraw") << " WITHDRAW MONEY ===\n";
                 cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
                 cout << "Enter Amount to Withdraw: $";
                 double amount;
                 cin >> amount;
+                cin.ignore(); // Clear input buffer
                 
                 if (amount > 0) {
                     if (currentUser->makeWithdrawal(amount)) {
@@ -714,20 +754,23 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 } else {
                     cout << getIcon("error") << " Invalid amount!\n";
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 3: { // Check Balance
+                clearScreen();
                 cout << "\n=== " << getIcon("balance") << " ACCOUNT BALANCE ===\n";
                 cout << "Account Holder: " << currentUser->getName() << "\n";
-                cout << "Email: " << currentUser->getEmail() << "\n";
-                cout << "Account Number: " << currentUser->getAccount()->getAccountNumber() << "\n";
-                cout << "Account Type: " << currentUser->getAccount()->getAccountType() << "\n";
                 cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 4: { // Transaction History
+                clearScreen();
                 cout << "\n=== " << getIcon("history") << " TRANSACTION HISTORY ===\n";
                 auto transactions = currentUser->getTransactions();
                 auto accountHistory = currentUser->getAccount()->getTransactionHistory();
@@ -751,10 +794,13 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 if (transactions.empty() && accountHistory.empty()) {
                     cout << "No transactions found.\n";
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 5: { // Transfer Money
+                clearScreen();
                 cout << "\n=== " << getIcon("transfer") << " TRANSFER MONEY ===\n";
                 cout << "Your Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
                 cout << "Enter Recipient Email: ";
@@ -764,11 +810,15 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 User* toUser = bank.findUser("email", toEmail);
                 if (!toUser) {
                     cout << getIcon("error") << " Recipient account not found!\n";
+                    cout << "\nPress Enter to continue...";
+                    cin.get();
                     break;
                 }
                 
                 if (toUser->getEmail() == currentUser->getEmail()) {
                     cout << getIcon("error") << " Cannot transfer to yourself!\n";
+                    cout << "\nPress Enter to continue...";
+                    cin.get();
                     break;
                 }
                 
@@ -776,6 +826,7 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 cout << "Enter Amount to Transfer: $";
                 double amount;
                 cin >> amount;
+                cin.ignore(); // Clear input buffer
                 
                 if (amount > 0) {
                     if (currentUser->makeWithdrawal(amount)) {
@@ -795,10 +846,13 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 } else {
                     cout << getIcon("error") << " Invalid amount!\n";
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 6: { // Account Settings
+                clearScreen();
                 cout << "\n=== " << getIcon("settings") << " ACCOUNT SETTINGS ===\n";
                 cout << "1. View Profile\n";
                 cout << "2. Change Password\n";
@@ -808,23 +862,28 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                 
                 int settingsChoice;
                 cin >> settingsChoice;
+                cin.ignore(); // Clear input buffer
                 
                 switch (settingsChoice) {
                     case 1: {
-                        cout << "\n--- PROFILE INFORMATION ---\n";
+                        clearScreen();
+                        cout << "\n--- PROFILE INFORMATION ---\n\n";
                         currentUser->displayInfo();
-                        cout << "Phone: " << currentUser->getPhone() << "\n";
+                        cout << "\nPress Enter to continue...";
+                        cin.get();
                         break;
                     }
                     case 2: {
+                        clearScreen();
                         cout << "\n--- CHANGE PASSWORD ---\n";
                         cout << "Enter Current Password: ";
                         string currentPass, newPass, confirmPass;
-                        cin.ignore();
                         getline(cin, currentPass);
                         
                         if (!currentUser->verifyPassword(currentPass)) {
                             cout << getIcon("error") << " Current password is incorrect!\n";
+                            cout << "\nPress Enter to continue...";
+                            cin.get();
                             break;
                         }
                         
@@ -841,31 +900,38 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
                             // Note: In a full implementation, we'd add a setPassword method
                             cout << getIcon("success") << " Password change simulated (feature not fully implemented).\n";
                         }
+                        cout << "\nPress Enter to continue...";
+                        cin.get();
                         break;
                     }
                     case 3: {
+                        clearScreen();
                         cout << "\n--- UPDATE PHONE NUMBER ---\n";
                         cout << "Current Phone: " << currentUser->getPhone() << "\n";
                         cout << "Enter New Phone Number: ";
                         string newPhone;
-                        cin.ignore();
                         getline(cin, newPhone);
                         
                         currentUser->setPhone(newPhone);
                         bank.saveData();
                         cout << getIcon("success") << " Phone number updated successfully!\n";
+                        cout << "\nPress Enter to continue...";
+                        cin.get();
                         break;
                     }
                     case 4:
                         continue; // Back to dashboard
                     default:
                         cout << getIcon("error") << " Invalid choice!\n";
+                        cout << "\nPress Enter to continue...";
+                        cin.get();
                         break;
                 }
                 break;
             }
             
             case 7: { // Logout
+                clearScreen();
                 cout << "\n" << getIcon("logout") << " Logging out...\n";
                 cout << "Thank you for using SecureBank, " << currentUser->getName() << "!\n";
                 return; // Exit banking operations
@@ -873,13 +939,11 @@ void handleBankingOperations(BankSystem& bank, User* currentUser) {
             
             default: {
                 cout << getIcon("error") << " Invalid choice! Please select 1-7.\n";
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
         }
-        
-        cout << "\nPress Enter to continue...";
-        cin.ignore();
-        cin.get();
     }
 }
 
@@ -889,6 +953,7 @@ void runCLI() {
     int choice;
     
     while (true) {
+        clearScreen(); // Clear screen for clean interface
         displayAuthMenu();
         
         if (!(cin >> choice)) {
@@ -900,95 +965,93 @@ void runCLI() {
             continue;
         }
         
+        // Clear the input buffer after successful input
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
         switch (choice) {
             case 1: { // Register
+                clearScreen();
                 if (registerNewUser(bank)) {
                     // Registration successful, continue to main menu for login
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 2: { // Login
+                clearScreen();
                 User* currentUser = loginUser(bank);
                 if (currentUser) {
                     // Start banking session
                     handleBankingOperations(bank, currentUser);
                 }
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
             
             case 3: { // Help
                 showOOPConcepts();
-                continue;
+                break;
             }
             
             case 4: { // Exit
+                clearScreen();
                 cout << "\n" << getIcon("exit") << " Thank you for using SecureBank!\n";
-                cout << "Your data has been saved securely.\n";
-                cout << "This system showcased comprehensive C++ OOP concepts.\n";
-                cout << "Perfect for academic projects and learning! " << getIcon("bank") << "\n";
                 return;
             }
             
             default: {
                 cout << getIcon("error") << " Invalid choice! Please select 1-4.\n";
+                cout << "\nPress Enter to continue...";
+                cin.get();
                 break;
             }
         }
-        
-        cout << "\nPress Enter to continue...";
-        cin.ignore();
-        cin.get();
     }
 }
 
 //================================ MODE SELECTION ================================
 
 void displayWelcomeScreen() {
-    cout << "\n";
+    cout << "Made with <3\n\n";
     cout << "========================================\n";
     cout << "         " << getIcon("bank") << " SECURE BANK SYSTEM         \n";
     cout << "========================================\n";
-    cout << "    Advanced C++ OOP Banking System    \n";
-    cout << "========================================\n";
     cout << "\nAvailable Modes:\n";
-    cout << "1. " << getIcon("register") << " CLI Mode  - Command Line Interface\n";
-    cout << "2. " << getIcon("login") << " Web Mode  - Browser Interface\n";
-    cout << "3. " << getIcon("help") << " Help      - Show OOP concepts\n";
-    cout << "4. " << getIcon("exit") << " Exit      - Quit application\n";
+    cout << "1. " << getIcon("register") << "CLI Mode  - Command Line Interface\n";
+    cout << "2. " << getIcon("login") << "Web Mode  - Browser Interface\n";
+    cout << "3. " << getIcon("exit") << "Exit      - Quit application\n";
     cout << "\n========================================\n";
-    cout << "Select mode (1-4): ";
+    cout << "\nSelect mode (1-3): ";
 }
 
 void showOOPConcepts() {
-    cout << "\n" << getIcon("help") << " C++ OOP Concepts Demonstrated in this System:\n";
-    cout << "================================================\n";
-    cout << getIcon("success") << " Classes & Objects        - Person, User, Account, Transaction, BankSystem\n";
-    cout << getIcon("success") << " Inheritance              - User inherits from abstract Person class\n";
-    cout << getIcon("success") << " Polymorphism             - Virtual functions and method overriding\n";
-    cout << getIcon("success") << " Encapsulation            - Private/Protected members with public interface\n";
-    cout << getIcon("success") << " Abstraction              - Abstract Person class with pure virtual functions\n";
-    cout << getIcon("success") << " Composition              - User HAS-A Account relationship\n";
-    cout << getIcon("success") << " Aggregation              - BankSystem contains multiple User objects\n";
-    cout << getIcon("success") << " Operator Overloading     - += for deposits, -= for withdrawals, = assignment\n";
-    cout << getIcon("success") << " Static Members & Methods - Class-level data and functions\n";
-    cout << getIcon("success") << " Templates                - Generic findUser<T>() method\n";
-    cout << getIcon("success") << " STL Containers           - vector for transactions, map for users\n";
-    cout << getIcon("success") << " Constructor/Destructor   - Proper object lifecycle management\n";
-    cout << getIcon("success") << " Copy Constructor         - Deep copying for complex objects\n";
-    cout << getIcon("success") << " Assignment Operator      - Safe object assignment\n";
-    cout << getIcon("success") << " Friend Classes           - Controlled access to private members\n";
-    cout << getIcon("success") << " Dynamic Memory           - new/delete for Account objects\n";
-    cout << getIcon("success") << " File I/O & Persistence   - Data saved to local file storage\n";
-    cout << "\n" << getIcon("bank") << " Educational Features:\n";
-    cout << "• Single file implementation for easy submission\n";
-    cout << "• Both CLI and Web interfaces demonstrating same OOP backend\n";
-    cout << "• Comprehensive banking operations with transaction history\n";
-    cout << "• Modern C++ features with clean, readable code structure\n";
-    cout << "• Cross-platform compatibility (Windows/Linux)\n";
-    cout << "• Persistent data storage with encryption\n";
+    clearScreen();
+    cout << "\n" << getIcon("help") << " About This Banking System:\n";
+    cout << "=========================================\n";
+    cout << "\nThis project demonstrates various C++ concepts:\n\n";
+    cout << "- Classes and Objects - User, Account, BankSystem classes\n";
+    cout << "- Inheritance - User class inherits from Person base class\n";
+    cout << "- Polymorphism - Virtual functions and method overriding\n";
+    cout << "- Encapsulation - Private data with public methods\n";
+    cout << "- File I/O - Saving user data to local files\n";
+    cout << "- STL Containers - Using vector and map for data storage\n";
+    cout << "- Error Handling - Input validation and exception handling\n";
+    cout << "\nFeatures:\n";
+    cout << "- Account registration and login\n";
+    cout << "- Deposit and withdrawal operations\n";
+    cout << "- Money transfer between accounts\n";
+    cout << "- Transaction history tracking\n";
+    cout << "- Cross-platform compatibility (Windows/Linux)\n";
+    cout << "- Both CLI and Web interfaces\n";
+    cout << "\nThis system shows practical application of OOP principles\n";
+    cout << "in a real-world banking scenario.\n\n";
+    cout << "@Prash <3\n";
+
     cout << "\nPress Enter to continue...";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
 }
 
 //================================ MAIN APPLICATION ================================
@@ -1002,7 +1065,7 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (arg == "--web" || arg == "-w") {
             // Skip menu, go directly to web mode
-            cout << "🌐 Starting Web Banking Application directly...\n\n";
+            cout << "Starting Web Banking Application directly...\n\n";
             goto web_mode;
         }
     }
@@ -1010,13 +1073,14 @@ int main(int argc, char* argv[]) {
     // Interactive Mode Selection
     int choice;
     while (true) {
+        clearScreen(); // Clear screen for main menu
         displayWelcomeScreen();
         
         // Clear input buffer and read choice
         if (!(cin >> choice)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "\n❌ Invalid input! Please enter a number (1-4).\n";
+            cout << "\n" << getIcon("error") << " Invalid input! Please enter a number (1-3).\n";
             cout << "Press Enter to continue...";
             cin.get();
             continue;
@@ -1027,30 +1091,25 @@ int main(int argc, char* argv[]) {
         
         switch (choice) {
             case 1: { // CLI Mode
-                cout << "\n💻 Starting CLI Banking System...\n";
+                cout << "\nStarting CLI Banking System...\n";
                 runCLI();
                 return 0;
             }
             
             case 2: { // Web Mode
-                cout << "\n🌐 Starting Web Banking Application...\n";
+                cout << "\nStarting Web Banking Application...\n";
                 break; // Exit switch to start web mode
             }
             
-            case 3: { // Help/OOP Concepts
-                showOOPConcepts();
-                continue; // Show menu again
-            }
-            
-            case 4: { // Exit
+            case 3: { // Exit
+                clearScreen();
                 cout << "\n� Thank you for exploring SecureBank!\n";
-                cout << "This system showcased comprehensive C++ OOP concepts.\n";
-                cout << "Perfect for academic projects and learning! 🎓\n";
+               
                 return 0;
             }
             
             default: {
-                cout << "\n❌ Invalid choice! Please select 1-4.\n";
+                cout << "\n" << getIcon("error") << " Invalid choice! Please select 1-3.\n";
                 cout << "Press Enter to continue...";
                 cin.get();
                 continue;
@@ -1070,16 +1129,16 @@ int main(int argc, char* argv[]) {
     
     crow::SimpleApp app;
     string exe_dir = get_executable_dir();
-    cout << "📂 Executable directory: " << exe_dir << endl;
+    cout << "Executable directory: " << exe_dir << endl;
 
     // Check if public folder exists using absolute path
     string index_path = get_file_path("public/index.html");
     ifstream test_file(index_path);
     if (!test_file.is_open()) {
-        cerr << "⚠️  Warning: " << index_path << " not found!" << endl;
+        cerr << getIcon("warning") << " Warning: " << index_path << " not found!" << endl;
         cerr << "   This usually happens when Task Scheduler runs from wrong directory" << endl;
     } else {
-        cout << "✅ Found: " << index_path << endl;
+        cout << getIcon("success") << " Found: " << index_path << endl;
         test_file.close();
     }
 
@@ -1223,7 +1282,7 @@ int main(int argc, char* argv[]) {
 
     // Wait a moment for server to start, then open browser
     this_thread::sleep_for(chrono::milliseconds(2000));
-    cout << "🌐 Opening browser..." << endl;
+    cout << "Opening browser..." << endl;
     open_browser("http://localhost:8080");
 
     // Keep the main thread alive
