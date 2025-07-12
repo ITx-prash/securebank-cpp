@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.log
+crow-bank-app/build-linux/
+crow-bank-app/win-build/
+crow-bank-app/build/
+.DS_Store
