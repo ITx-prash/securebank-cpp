@@ -1,0 +1,3 @@
+/home/prash/Desktop/CPP_Bank_Proj/crow-bank-app/build-linux/CMakeFiles/crow_bank_app.dir
+/home/prash/Desktop/CPP_Bank_Proj/crow-bank-app/build-linux/CMakeFiles/edit_cache.dir
+/home/prash/Desktop/CPP_Bank_Proj/crow-bank-app/build-linux/CMakeFiles/rebuild_cache.dir
