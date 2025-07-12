@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.log
+build-linux/
+win-build/
+.DS_Store

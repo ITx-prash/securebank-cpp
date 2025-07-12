@@ -2,29 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Voting Age Checker</title>
-  <style>
-    body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin-top: 50px; }
-    input, button { padding: 10px; margin: 10px; font-size: 18px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureBank - Welcome</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Voting Age Checker</h1>
-  <input type="number" id="age" placeholder="Enter your age">
-  <button onclick="checkAge()">Check</button>
-  <p id="result"></p>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <div class="flex items-center">
+          <h1 class="text-2xl font-bold text-indigo-600">🏦 SecureBank</h1>
+        </div>
+        <div class="flex space-x-4">
+          <a href="/login" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+          <a href="#signup" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <script>
-    async function checkAge() {
-      const age = document.getElementById("age").value;
-      const res = await fetch("/check_age", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ age: parseInt(age) })
-      });
-      const data = await res.json();
-      document.getElementById("result").innerText = data.message;
-    }
-  </script>
+  <!-- Hero Section -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+      <!-- Left Column - Hero Content -->
+      <div class="mb-8 lg:mb-0">
+        <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+          Your Money,
+          <span class="text-indigo-600">Secured</span>
+        </h1>
+        <p class="mt-3 text-xl text-gray-500 sm:mt-5 sm:text-2xl">
+          Experience modern banking with cutting-edge security and seamless transactions.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <a href="#signup" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-md text-lg font-medium">
+            Open Account
+          </a>
+          <a href="/login" class="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-md text-lg font-medium">
+            Login
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column - Signup Form -->
+      <div id="signup" class="bg-white rounded-lg shadow-xl p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Create Your Account</h2>
+        <form class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+              <input type="text" id="firstName" name="firstName" required
+                     class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+              <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+              <input type="text" id="lastName" name="lastName" required
+                     class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+          </div>
+          
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input type="email" id="email" name="email" required
+                   class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required
+                   class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" required
+                   class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required
+                   class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          
+          <div class="flex items-center">
+            <input id="terms" name="terms" type="checkbox" required
+                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+            <label for="terms" class="ml-2 block text-sm text-gray-900">
+              I agree to the <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms and Conditions</a>
+            </label>
+          </div>
+          
+          <button type="submit" 
+                  class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            Create Account
+          </button>
+        </form>
+        
+        <p class="mt-6 text-center text-sm text-gray-500">
+          Already have an account? 
+          <a href="/login" class="text-indigo-600 hover:text-indigo-500 font-medium">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureBank - Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center">
+            <h1 class="text-xl font-bold text-indigo-600">🏦 SecureBank</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span id="userName" class="text-gray-700 font-medium"
+              >Welcome, John</span
+            >
+            <button
+              onclick="logout()"
+              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Account Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Balance Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-green-100 rounded-md">
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                ></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Current Balance</p>
+              <p
+                id="accountBalance"
+                class="text-2xl font-semibold text-gray-900"
+              >
+                $5,847.32
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-blue-100 rounded-md">
+              <svg
+                class="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                ></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Savings Account</p>
+              <p class="text-2xl font-semibold text-gray-900">$12,450.89</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credit Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-red-100 rounded-md">
+              <svg
+                class="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                ></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Credit Available</p>
+              <p class="text-2xl font-semibold text-gray-900">$2,150.00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Quick Actions -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Quick Actions
+            </h2>
+            <div class="space-y-3">
+              <button
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-left"
+              >
+                💸 Transfer Money
+              </button>
+              <button
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-left"
+              >
+                💰 Deposit Funds
+              </button>
+              <button
+                class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-md text-left"
+              >
+                🏧 Withdraw Cash
+              </button>
+              <button
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-left"
+              >
+                📊 View Statements
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Recent Transactions
+            </h2>
+            <div class="space-y-4">
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-green-100 rounded-md mr-3">
+                    <svg
+                      class="w-4 h-4 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">Salary Deposit</p>
+                    <p class="text-sm text-gray-500">Dec 1, 2024</p>
+                  </div>
+                </div>
+                <span class="text-green-600 font-medium">+$3,200.00</span>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-red-100 rounded-md mr-3">
+                    <svg
+                      class="w-4 h-4 text-red-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">Grocery Store</p>
+                    <p class="text-sm text-gray-500">Nov 30, 2024</p>
+                  </div>
+                </div>
+                <span class="text-red-600 font-medium">-$127.45</span>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-blue-100 rounded-md mr-3">
+                    <svg
+                      class="w-4 h-4 text-blue-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">Transfer to Savings</p>
+                    <p class="text-sm text-gray-500">Nov 29, 2024</p>
+                  </div>
+                </div>
+                <span class="text-blue-600 font-medium">-$500.00</span>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-green-100 rounded-md mr-3">
+                    <svg
+                      class="w-4 h-4 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900">Freelance Payment</p>
+                    <p class="text-sm text-gray-500">Nov 28, 2024</p>
+                  </div>
+                </div>
+                <span class="text-green-600 font-medium">+$850.00</span>
+              </div>
+            </div>
+
+            <div class="mt-4 text-center">
+              <button
+                class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
+              >
+                View All Transactions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Check if user is authenticated
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      function logout() {
+        localStorage.removeItem("authToken");
+        window.location.href = "/login";
+      }
+
+      // Load user data
+      async function loadUserData() {
+        try {
+          const response = await fetch("/api/user-data", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            document.getElementById(
+              "userName"
+            ).textContent = `Welcome, ${userData.name}`;
+            document.getElementById(
+              "accountBalance"
+            ).textContent = `$${userData.balance.toLocaleString()}`;
+          }
+        } catch (error) {
+          console.error("Failed to load user data:", error);
+        }
+      }
+
+      // Load user data when page loads
+      loadUserData();
+    </script>
+  </body>
+</html>

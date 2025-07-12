@@ -1,3 +1,0 @@
-/usr/bin/cmake -E rm -f CMakeFiles/crow_bank_app.dir/objects.a
-/usr/bin/x86_64-w64-mingw32-ar qc CMakeFiles/crow_bank_app.dir/objects.a @CMakeFiles/crow_bank_app.dir/objects1.rsp
-/usr/bin/x86_64-w64-mingw32-g++  -static-libgcc -static-libstdc++ -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles/crow_bank_app.dir/objects.a -Wl,--no-whole-archive -o crow_bank_app.exe -Wl,--out-implib,libcrow_bank_app.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/crow_bank_app.dir/linkLibs.rsp
