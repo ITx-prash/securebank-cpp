@@ -6,183 +6,1228 @@
 #include <filesystem>
 #include <map>
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <random>
+#include <iomanip>
+#include <limits>
+#include <sstream>
+
+using namespace std;
 
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
 #endif
 
-// In-memory user storage
-struct User
-{
-    std::string email;
-    std::string password;
-    std::string name;
-    double balance;
+//================================ OOP CONCEPTS IMPLEMENTATION ================================
+
+// Base class demonstrating Inheritance and Polymorphism
+class Person {
+protected:  // Data Abstraction - protected members
+    string name;
+    string email;
+    string phone;
+    
+public:
+    // Constructor
+    Person() : name(""), email(""), phone("") {}
+    
+    Person(string n, string e, string p) : name(n), email(e), phone(p) {}
+    
+    // Virtual destructor for proper inheritance
+    virtual ~Person() {}
+    
+    // Pure virtual function - Abstract class concept
+    virtual void displayInfo() const = 0;
+    
+    // Getter methods - Encapsulation
+    string getName() const { return name; }
+    string getEmail() const { return email; }
+    string getPhone() const { return phone; }
+    
+    // Setter methods - Encapsulation
+    void setName(const string& n) { name = n; }
+    void setEmail(const string& e) { email = e; }
+    void setPhone(const string& p) { phone = p; }
 };
 
-std::map<std::string, User> users = {
-    {"john@bank.com", {"john@bank.com", "password123", "John Doe", 5847.32}},
-    {"jane@bank.com", {"jane@bank.com", "password456", "Jane Smith", 12450.89}}};
+// Account class demonstrating Encapsulation
+class Account {
+private:
+    string accountNumber;
+    string accountType;
+    double balance;
+    vector<string> transactionHistory; // STL container
+    
+    // Private method for account number generation
+    string generateAccountNumber() {
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<long long> dis(100000000000LL, 999999999999LL);
+        return to_string(dis(gen));
+    }
+    
+public:
+    // Constructor with member initialization list
+    Account(string type = "Savings") : accountType(type), balance(0.0) {
+        accountNumber = generateAccountNumber();
+    }
+    
+    // Copy constructor
+    Account(const Account& other) 
+        : accountNumber(other.accountNumber), accountType(other.accountType), 
+          balance(other.balance), transactionHistory(other.transactionHistory) {}
+    
+    // Assignment operator overloading
+    Account& operator=(const Account& other) {
+        if (this != &other) {
+            accountNumber = other.accountNumber;
+            accountType = other.accountType;
+            balance = other.balance;
+            transactionHistory = other.transactionHistory;
+        }
+        return *this;
+    }
+    
+    // Operator overloading for deposit (+)
+    Account& operator+=(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            transactionHistory.push_back("Deposit: $" + to_string(amount));
+        }
+        return *this;
+    }
+    
+    // Operator overloading for withdrawal (-)
+    Account& operator-=(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+            transactionHistory.push_back("Withdrawal: $" + to_string(amount));
+        }
+        return *this;
+    }
+    
+    // Getter methods
+    string getAccountNumber() const { return accountNumber; }
+    string getAccountType() const { return accountType; }
+    double getBalance() const { return balance; }
+    vector<string> getTransactionHistory() const { return transactionHistory; }
+    
+    // Setter methods for file loading
+    void setBalance(double newBalance) { balance = newBalance; }
+    void setAccountNumber(const string& newAccountNumber) { accountNumber = newAccountNumber; }
+    
+    // Method for checking sufficient funds
+    bool hasSufficientFunds(double amount) const {
+        return balance >= amount;
+    }
+};
 
-std::map<std::string, std::string> sessions; // token -> email
+// Transaction class demonstrating Composition
+class Transaction {
+private:
+    string transactionId;
+    string type;
+    double amount;
+    string timestamp;
+    
+    string generateTransactionId() {
+        return "TXN" + to_string(time(nullptr)) + to_string(rand() % 1000);
+    }
+    
+public:
+    Transaction(string t, double a) : type(t), amount(a) {
+        transactionId = generateTransactionId();
+        time_t now = time(0);
+        timestamp = ctime(&now);
+        timestamp.pop_back(); // Remove newline
+    }
+    
+    // Getter methods
+    string getId() const { return transactionId; }
+    string getType() const { return type; }
+    double getAmount() const { return amount; }
+    string getTimestamp() const { return timestamp; }
+};
 
-std::string get_executable_dir()
-{
+// User class demonstrating Inheritance from Person
+class User : public Person {
+private:
+    string password;
+    Account* account; // Composition - User HAS-A Account
+    vector<Transaction> transactions; // STL container for transactions
+    static string bankName; // Static member
+    
+public:
+    // Constructor
+    User() : Person(), password(""), account(nullptr) {}
+    
+    User(string n, string e, string p, string pass) 
+        : Person(n, e, p), password(pass) {
+        account = new Account("Savings"); // Dynamic memory allocation
+    }
+    
+    // Destructor
+    ~User() {
+        delete account; // Clean up dynamic memory
+    }
+    
+    // Copy constructor
+    User(const User& other) : Person(other), password(other.password) {
+        if (other.account) {
+            account = new Account(*other.account);
+        } else {
+            account = nullptr;
+        }
+        transactions = other.transactions;
+    }
+    
+    // Assignment operator
+    User& operator=(const User& other) {
+        if (this != &other) {
+            Person::operator=(other);
+            password = other.password;
+            delete account;
+            if (other.account) {
+                account = new Account(*other.account);
+            } else {
+                account = nullptr;
+            }
+            transactions = other.transactions;
+        }
+        return *this;
+    }
+    
+    // Override pure virtual function from Person
+    void displayInfo() const override {
+        cout << "User Info - Name: " << name << ", Email: " << email 
+             << ", Phone: " << phone << endl;
+        if (account) {
+            cout << "Account: " << account->getAccountNumber() 
+                 << ", Balance: $" << account->getBalance() << endl;
+        }
+    }
+    
+    // Method to verify password
+    bool verifyPassword(const string& pass) const {
+        return password == pass;
+    }
+    
+    // Methods for banking operations
+    bool makeDeposit(double amount) {
+        if (amount > 0 && account) {
+            *account += amount; // Using overloaded operator
+            transactions.push_back(Transaction("Deposit", amount));
+            return true;
+        }
+        return false;
+    }
+    
+    bool makeWithdrawal(double amount) {
+        if (amount > 0 && account && account->hasSufficientFunds(amount)) {
+            *account -= amount; // Using overloaded operator
+            transactions.push_back(Transaction("Withdrawal", amount));
+            return true;
+        }
+        return false;
+    }
+    
+    // Getter methods
+    Account* getAccount() const { return account; }
+    vector<Transaction> getTransactions() const { return transactions; }
+    string getPassword() const { return password; } // For file storage
+    
+    // Static method
+    static void displayBankInfo() {
+        cout << "Welcome to " << bankName << " Banking System" << endl;
+    }
+    
+    // Friend function for accessing private members
+    friend class BankSystem;
+};
+
+// Static member definition
+string User::bankName = "SecureBank";
+
+//================================ UTILITY FUNCTIONS ================================
+
+string get_executable_dir() {
 #ifdef _WIN32
     char path[MAX_PATH];
     GetModuleFileNameA(NULL, path, MAX_PATH);
-    std::string exe_path(path);
+    string exe_path(path);
     size_t last_slash = exe_path.find_last_of("\\/");
     return exe_path.substr(0, last_slash);
 #else
-    std::string exe_path = std::filesystem::canonical("/proc/self/exe");
-    return std::filesystem::path(exe_path).parent_path();
+    string exe_path = filesystem::canonical("/proc/self/exe");
+    return filesystem::path(exe_path).parent_path();
 #endif
 }
 
-std::string get_file_path(const std::string &relative_path)
-{
-    static std::string exe_dir = get_executable_dir();
+string get_file_path(const string& relative_path) {
+    static string exe_dir = get_executable_dir();
     return exe_dir + "/" + relative_path;
 }
 
-void open_browser(const std::string &url)
-{
+// Cross-platform icon display
+string getIcon(const string& iconType) {
+#ifdef _WIN32
+    // Windows fallback - simple characters
+    if (iconType == "bank") return "[BANK]";
+    if (iconType == "register") return "[REG]";
+    if (iconType == "login") return "[LOGIN]";
+    if (iconType == "help") return "[HELP]";
+    if (iconType == "exit") return "[EXIT]";
+    if (iconType == "deposit") return "[DEP]";
+    if (iconType == "withdraw") return "[WITH]";
+    if (iconType == "balance") return "[BAL]";
+    if (iconType == "history") return "[HIST]";
+    if (iconType == "transfer") return "[TRANS]";
+    if (iconType == "settings") return "[SET]";
+    if (iconType == "logout") return "[OUT]";
+    if (iconType == "success") return "[OK]";
+    if (iconType == "error") return "[ERR]";
+    if (iconType == "warning") return "[WARN]";
+    return "[*]";
+#else
+    // Linux/Unix - Unicode emojis
+    if (iconType == "bank") return "🏦";
+    if (iconType == "register") return "📝";
+    if (iconType == "login") return "🔐";
+    if (iconType == "help") return "❓";
+    if (iconType == "exit") return "🚪";
+    if (iconType == "deposit") return "💰";
+    if (iconType == "withdraw") return "💸";
+    if (iconType == "balance") return "💳";
+    if (iconType == "history") return "📊";
+    if (iconType == "transfer") return "🔄";
+    if (iconType == "settings") return "⚙️";
+    if (iconType == "logout") return "🚪";
+    if (iconType == "success") return "✅";
+    if (iconType == "error") return "❌";
+    if (iconType == "warning") return "⚠️";
+    return "•";
+#endif
+}
+
+// File storage functions
+string getUserDataPath() {
+    return get_file_path("users.dat");
+}
+
+// Simple encryption for password storage (basic XOR - not production-ready)
+string encryptPassword(const string& password) {
+    string encrypted = password;
+    const string key = "SecureBankKey2025";
+    for (size_t i = 0; i < encrypted.length(); ++i) {
+        encrypted[i] ^= key[i % key.length()];
+    }
+    return encrypted;
+}
+
+string decryptPassword(const string& encrypted) {
+    return encryptPassword(encrypted); // XOR is symmetric
+}
+
+// Forward declaration for User class
+class User;
+
+// Forward declarations for functions
+void showOOPConcepts();
+
+// Save user data to file
+bool saveUsersToFile(const map<string, User>& users) {
+    try {
+        ofstream file(getUserDataPath());
+        if (!file.is_open()) {
+            return false;
+        }
+        
+        // Simple format: email|name|phone|encrypted_password|account_number|account_type|balance
+        for (const auto& pair : users) {
+            const User& user = pair.second;
+            if (user.getAccount()) {
+                file << user.getEmail() << "|"
+                     << user.getName() << "|"
+                     << user.getPhone() << "|"
+                     << encryptPassword(user.getPassword()) << "|"
+                     << user.getAccount()->getAccountNumber() << "|"
+                     << user.getAccount()->getAccountType() << "|"
+                     << user.getAccount()->getBalance() << endl;
+            }
+        }
+        file.close();
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+// Load user data from file
+bool loadUsersFromFile(map<string, User>& users, int& totalUsers) {
+    try {
+        ifstream file(getUserDataPath());
+        if (!file.is_open()) {
+            return false; // File doesn't exist yet
+        }
+        
+        string line;
+        while (getline(file, line)) {
+            if (line.empty()) continue;
+            
+            stringstream ss(line);
+            string email, name, phone, encryptedPass, accountNum, accountType, balanceStr;
+            
+            if (getline(ss, email, '|') &&
+                getline(ss, name, '|') &&
+                getline(ss, phone, '|') &&
+                getline(ss, encryptedPass, '|') &&
+                getline(ss, accountNum, '|') &&
+                getline(ss, accountType, '|') &&
+                getline(ss, balanceStr)) {
+                
+                string password = decryptPassword(encryptedPass);
+                double balance = stod(balanceStr);
+                
+                User user(name, email, phone, password);
+                // Set account details
+                if (user.getAccount()) {
+                    user.getAccount()->setBalance(balance);
+                    user.getAccount()->setAccountNumber(accountNum);
+                }
+                
+                users[email] = user;
+                totalUsers++;
+            }
+        }
+        file.close();
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+// Bank System class demonstrating Aggregation and Templates
+class BankSystem {
+private:
+    string bankName;
+    map<string, User> users; // STL container - Aggregation
+    map<string, string> sessions; // token -> email mapping
+    static int totalUsers; // Static member
+    
+    string generateToken() {
+        return "token_" + to_string(rand()) + "_" + to_string(time(nullptr));
+    }
+    
+public:
+    // Constructor
+    BankSystem(string name) : bankName(name) {
+        // Load existing users from file
+        if (!loadUsersFromFile(users, totalUsers)) {
+            // If no file exists, create demo users
+            User demoUser("John Doe", "john@demo.com", "123-456-7890", "password123");
+            users["john@demo.com"] = demoUser;
+            totalUsers++;
+            
+            User demoUser2("Jane Smith", "jane@demo.com", "987-654-3210", "password456");
+            users["jane@demo.com"] = demoUser2;
+            totalUsers++;
+            
+            // Save demo users to file
+            saveUsersToFile(users);
+        }
+    }
+    
+    // Destructor - save data when system shuts down
+    ~BankSystem() {
+        saveUsersToFile(users);
+    }
+    
+    // Method to authenticate user
+    string authenticateUser(const string& email, const string& password) {
+        auto it = users.find(email);
+        if (it != users.end() && it->second.verifyPassword(password)) {
+            string token = generateToken();
+            sessions[token] = email;
+            return token;
+        }
+        return "";
+    }
+    
+    // Method to get user by token
+    User* getUserByToken(const string& token) {
+        auto sessionIt = sessions.find(token);
+        if (sessionIt != sessions.end()) {
+            auto userIt = users.find(sessionIt->second);
+            if (userIt != users.end()) {
+                return &userIt->second;
+            }
+        }
+        return nullptr;
+    }
+    
+    // Method to add new user
+    bool addUser(const User& user) {
+        if (users.find(user.getEmail()) == users.end()) {
+            users[user.getEmail()] = user;
+            totalUsers++;
+            saveUsersToFile(users); // Save immediately
+            return true;
+        }
+        return false;
+    }
+    
+    // Method to save current state
+    bool saveData() {
+        return saveUsersToFile(users);
+    }
+    
+    // Static method to get total users
+    static int getTotalUsers() {
+        return totalUsers;
+    }
+    
+    // Template method for finding users (Template concept)
+    template <typename T>
+    User* findUser(const string& key, T value) {
+        for (auto& pair : users) {
+            if (key == "email" && pair.second.getEmail() == value) {
+                return &pair.second;
+            }
+            if (key == "name" && pair.second.getName() == value) {
+                return &pair.second;
+            }
+        }
+        return nullptr;
+    }
+};
+
+// Static member definition
+int BankSystem::totalUsers = 0;
+
+//================================ WEB UTILITY FUNCTIONS ================================
+
+void open_browser(const string& url) {
 #ifdef _WIN32
     ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #else
-    std::string command = "xdg-open " + url + " 2>/dev/null &";
+    string command = "xdg-open " + url + " 2>/dev/null &";
     system(command.c_str());
 #endif
 }
 
-std::string read_file(const std::string &filename)
-{
-    std::string file_path = get_file_path("public/" + filename);
-    std::ifstream file(file_path);
-    if (!file.is_open())
-    {
-        std::cerr << "Error: Could not open " << file_path << std::endl;
+string read_file(const string& filename) {
+    string file_path = get_file_path("public/" + filename);
+    ifstream file(file_path);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open " << file_path << endl;
         return "Error: Could not load " + filename + ". Make sure public folder exists in the same directory as the executable.";
     }
-    return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    return string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
 }
 
-std::string generate_token()
-{
-    return "token_" + std::to_string(rand()) + "_" + std::to_string(time(nullptr));
+//================================ CLI BANKING SYSTEM ================================
+
+// Main CLI authentication menu
+void displayAuthMenu() {
+    cout << "\n";
+    cout << "==============================================\n";
+    cout << "        " << getIcon("bank") << " SECURE BANK CLI SYSTEM        \n";
+    cout << "==============================================\n";
+    cout << "     Advanced C++ OOP Banking Platform     \n";
+    cout << "==============================================\n";
+    cout << "\n";
+    cout << "1. " << getIcon("register") << " Register New Account\n";
+    cout << "2. " << getIcon("login") << " Login to Account\n";
+    cout << "3. " << getIcon("help") << " Help & OOP Concepts\n";
+    cout << "4. " << getIcon("exit") << " Exit\n";
+    cout << "\n==============================================\n";
+    cout << "Select option (1-4): ";
 }
 
-int main()
-{
+// Banking dashboard menu (after login)
+void displayBankingMenu(const string& userName) {
+    cout << "\n";
+    cout << "==============================================\n";
+    cout << "      " << getIcon("bank") << " WELCOME " << userName << "\n";
+    cout << "==============================================\n";
+    cout << "         Banking Dashboard\n";
+    cout << "==============================================\n";
+    cout << "\n";
+    cout << "1. " << getIcon("deposit") << " Deposit Money\n";
+    cout << "2. " << getIcon("withdraw") << " Withdraw Money\n";
+    cout << "3. " << getIcon("balance") << " Check Balance\n";
+    cout << "4. " << getIcon("history") << " Transaction History\n";
+    cout << "5. " << getIcon("transfer") << " Transfer Money\n";
+    cout << "6. " << getIcon("settings") << " Account Settings\n";
+    cout << "7. " << getIcon("logout") << " Logout\n";
+    cout << "\n==============================================\n";
+    cout << "Select option (1-7): ";
+}
+
+// Registration function
+bool registerNewUser(BankSystem& bank) {
+    cout << "\n=== " << getIcon("register") << " REGISTER NEW ACCOUNT ===\n";
+    
+    string firstName, lastName, email, phone, password, confirmPassword;
+    
+    cout << "Enter First Name: ";
+    cin.ignore();
+    getline(cin, firstName);
+    
+    cout << "Enter Last Name: ";
+    getline(cin, lastName);
+    
+    string fullName = firstName + " " + lastName;
+    
+    cout << "Enter Email: ";
+    getline(cin, email);
+    
+    // Email validation
+    if (email.find('@') == string::npos || email.find('.') == string::npos) {
+        cout << getIcon("error") << " Invalid email format!\n";
+        return false;
+    }
+    
+    cout << "Enter Phone Number: ";
+    getline(cin, phone);
+    
+    cout << "Enter Password: ";
+    getline(cin, password);
+    
+    cout << "Confirm Password: ";
+    getline(cin, confirmPassword);
+    
+    if (password != confirmPassword) {
+        cout << getIcon("error") << " Passwords do not match!\n";
+        return false;
+    }
+    
+    if (password.length() < 6) {
+        cout << getIcon("error") << " Password must be at least 6 characters!\n";
+        return false;
+    }
+    
+    // Create new user
+    User newUser(fullName, email, phone, password);
+    
+    if (bank.addUser(newUser)) {
+        cout << "\n" << getIcon("success") << " Account created successfully!\n";
+        cout << "Name: " << fullName << "\n";
+        cout << "Email: " << email << "\n";
+        cout << "Account Number: " << newUser.getAccount()->getAccountNumber() << "\n";
+        cout << "Account Type: " << newUser.getAccount()->getAccountType() << "\n";
+        cout << "Initial Balance: $0.00\n";
+        cout << "\nYou can now login with your email and password.\n";
+        return true;
+    } else {
+        cout << getIcon("error") << " Registration failed! Email already exists.\n";
+        return false;
+    }
+}
+
+// Login function
+User* loginUser(BankSystem& bank) {
+    cout << "\n=== " << getIcon("login") << " LOGIN TO ACCOUNT ===\n";
+    
+    string email, password;
+    
+    cout << "Enter Email: ";
+    cin.ignore();
+    getline(cin, email);
+    
+    cout << "Enter Password: ";
+    getline(cin, password);
+    
+    string token = bank.authenticateUser(email, password);
+    
+    if (!token.empty()) {
+        User* user = bank.getUserByToken(token);
+        if (user) {
+            cout << "\n" << getIcon("success") << " Login successful!\n";
+            cout << "Welcome back, " << user->getName() << "!\n";
+            return user;
+        }
+    }
+    
+    cout << getIcon("error") << " Invalid email or password!\n";
+    return nullptr;
+}
+
+// Banking operations after login
+void handleBankingOperations(BankSystem& bank, User* currentUser) {
+    int choice;
+    
+    while (true) {
+        displayBankingMenu(currentUser->getName());
+        
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << getIcon("error") << " Invalid input! Please enter a number (1-7).\n";
+            cout << "Press Enter to continue...";
+            cin.get();
+            continue;
+        }
+        
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
+        switch (choice) {
+            case 1: { // Deposit Money
+                cout << "\n=== " << getIcon("deposit") << " DEPOSIT MONEY ===\n";
+                cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                cout << "Enter Amount to Deposit: $";
+                double amount;
+                cin >> amount;
+                
+                if (amount > 0) {
+                    if (currentUser->makeDeposit(amount)) {
+                        bank.saveData(); // Save after transaction
+                        cout << getIcon("success") << " Deposit successful!\n";
+                        cout << "New Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                    } else {
+                        cout << getIcon("error") << " Deposit failed!\n";
+                    }
+                } else {
+                    cout << getIcon("error") << " Invalid amount!\n";
+                }
+                break;
+            }
+            
+            case 2: { // Withdraw Money
+                cout << "\n=== " << getIcon("withdraw") << " WITHDRAW MONEY ===\n";
+                cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                cout << "Enter Amount to Withdraw: $";
+                double amount;
+                cin >> amount;
+                
+                if (amount > 0) {
+                    if (currentUser->makeWithdrawal(amount)) {
+                        bank.saveData(); // Save after transaction
+                        cout << getIcon("success") << " Withdrawal successful!\n";
+                        cout << "New Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                    } else {
+                        cout << getIcon("error") << " Withdrawal failed! Insufficient funds or invalid amount.\n";
+                    }
+                } else {
+                    cout << getIcon("error") << " Invalid amount!\n";
+                }
+                break;
+            }
+            
+            case 3: { // Check Balance
+                cout << "\n=== " << getIcon("balance") << " ACCOUNT BALANCE ===\n";
+                cout << "Account Holder: " << currentUser->getName() << "\n";
+                cout << "Email: " << currentUser->getEmail() << "\n";
+                cout << "Account Number: " << currentUser->getAccount()->getAccountNumber() << "\n";
+                cout << "Account Type: " << currentUser->getAccount()->getAccountType() << "\n";
+                cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                break;
+            }
+            
+            case 4: { // Transaction History
+                cout << "\n=== " << getIcon("history") << " TRANSACTION HISTORY ===\n";
+                auto transactions = currentUser->getTransactions();
+                auto accountHistory = currentUser->getAccount()->getTransactionHistory();
+                
+                cout << "Account: " << currentUser->getAccount()->getAccountNumber() << "\n";
+                cout << "Current Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n\n";
+                
+                cout << "Recent Transactions:\n";
+                for (const auto& trans : accountHistory) {
+                    cout << "- " << trans << "\n";
+                }
+                
+                cout << "\nDetailed Transaction Log:\n";
+                for (const auto& trans : transactions) {
+                    cout << "ID: " << trans.getId() 
+                         << " | Type: " << trans.getType() 
+                         << " | Amount: $" << fixed << setprecision(2) << trans.getAmount()
+                         << " | Time: " << trans.getTimestamp() << "\n";
+                }
+                
+                if (transactions.empty() && accountHistory.empty()) {
+                    cout << "No transactions found.\n";
+                }
+                break;
+            }
+            
+            case 5: { // Transfer Money
+                cout << "\n=== " << getIcon("transfer") << " TRANSFER MONEY ===\n";
+                cout << "Your Balance: $" << fixed << setprecision(2) << currentUser->getAccount()->getBalance() << "\n";
+                cout << "Enter Recipient Email: ";
+                string toEmail;
+                getline(cin, toEmail);
+                
+                User* toUser = bank.findUser("email", toEmail);
+                if (!toUser) {
+                    cout << getIcon("error") << " Recipient account not found!\n";
+                    break;
+                }
+                
+                if (toUser->getEmail() == currentUser->getEmail()) {
+                    cout << getIcon("error") << " Cannot transfer to yourself!\n";
+                    break;
+                }
+                
+                cout << "Recipient: " << toUser->getName() << "\n";
+                cout << "Enter Amount to Transfer: $";
+                double amount;
+                cin >> amount;
+                
+                if (amount > 0) {
+                    if (currentUser->makeWithdrawal(amount)) {
+                        if (toUser->makeDeposit(amount)) {
+                            bank.saveData(); // Save after transaction
+                            cout << getIcon("success") << " Transfer successful!\n";
+                            cout << "Transferred $" << fixed << setprecision(2) << amount << " to " << toUser->getName() << "\n";
+                            cout << "Your new balance: $" << currentUser->getAccount()->getBalance() << "\n";
+                        } else {
+                            // Rollback if deposit fails
+                            currentUser->makeDeposit(amount);
+                            cout << getIcon("error") << " Transfer failed! Deposit to recipient failed.\n";
+                        }
+                    } else {
+                        cout << getIcon("error") << " Transfer failed! Insufficient funds.\n";
+                    }
+                } else {
+                    cout << getIcon("error") << " Invalid amount!\n";
+                }
+                break;
+            }
+            
+            case 6: { // Account Settings
+                cout << "\n=== " << getIcon("settings") << " ACCOUNT SETTINGS ===\n";
+                cout << "1. View Profile\n";
+                cout << "2. Change Password\n";
+                cout << "3. Update Phone Number\n";
+                cout << "4. Back to Dashboard\n";
+                cout << "Select option (1-4): ";
+                
+                int settingsChoice;
+                cin >> settingsChoice;
+                
+                switch (settingsChoice) {
+                    case 1: {
+                        cout << "\n--- PROFILE INFORMATION ---\n";
+                        currentUser->displayInfo();
+                        cout << "Phone: " << currentUser->getPhone() << "\n";
+                        break;
+                    }
+                    case 2: {
+                        cout << "\n--- CHANGE PASSWORD ---\n";
+                        cout << "Enter Current Password: ";
+                        string currentPass, newPass, confirmPass;
+                        cin.ignore();
+                        getline(cin, currentPass);
+                        
+                        if (!currentUser->verifyPassword(currentPass)) {
+                            cout << getIcon("error") << " Current password is incorrect!\n";
+                            break;
+                        }
+                        
+                        cout << "Enter New Password: ";
+                        getline(cin, newPass);
+                        cout << "Confirm New Password: ";
+                        getline(cin, confirmPass);
+                        
+                        if (newPass != confirmPass) {
+                            cout << getIcon("error") << " Passwords do not match!\n";
+                        } else if (newPass.length() < 6) {
+                            cout << getIcon("error") << " Password must be at least 6 characters!\n";
+                        } else {
+                            // Note: In a full implementation, we'd add a setPassword method
+                            cout << getIcon("success") << " Password change simulated (feature not fully implemented).\n";
+                        }
+                        break;
+                    }
+                    case 3: {
+                        cout << "\n--- UPDATE PHONE NUMBER ---\n";
+                        cout << "Current Phone: " << currentUser->getPhone() << "\n";
+                        cout << "Enter New Phone Number: ";
+                        string newPhone;
+                        cin.ignore();
+                        getline(cin, newPhone);
+                        
+                        currentUser->setPhone(newPhone);
+                        bank.saveData();
+                        cout << getIcon("success") << " Phone number updated successfully!\n";
+                        break;
+                    }
+                    case 4:
+                        continue; // Back to dashboard
+                    default:
+                        cout << getIcon("error") << " Invalid choice!\n";
+                        break;
+                }
+                break;
+            }
+            
+            case 7: { // Logout
+                cout << "\n" << getIcon("logout") << " Logging out...\n";
+                cout << "Thank you for using SecureBank, " << currentUser->getName() << "!\n";
+                return; // Exit banking operations
+            }
+            
+            default: {
+                cout << getIcon("error") << " Invalid choice! Please select 1-7.\n";
+                break;
+            }
+        }
+        
+        cout << "\nPress Enter to continue...";
+        cin.ignore();
+        cin.get();
+    }
+}
+
+void runCLI() {
+    BankSystem bank("SecureBank CLI");
+    
+    int choice;
+    
+    while (true) {
+        displayAuthMenu();
+        
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << getIcon("error") << " Invalid input! Please enter a number (1-4).\n";
+            cout << "Press Enter to continue...";
+            cin.get();
+            continue;
+        }
+        
+        switch (choice) {
+            case 1: { // Register
+                if (registerNewUser(bank)) {
+                    // Registration successful, continue to main menu for login
+                }
+                break;
+            }
+            
+            case 2: { // Login
+                User* currentUser = loginUser(bank);
+                if (currentUser) {
+                    // Start banking session
+                    handleBankingOperations(bank, currentUser);
+                }
+                break;
+            }
+            
+            case 3: { // Help
+                showOOPConcepts();
+                continue;
+            }
+            
+            case 4: { // Exit
+                cout << "\n" << getIcon("exit") << " Thank you for using SecureBank!\n";
+                cout << "Your data has been saved securely.\n";
+                cout << "This system showcased comprehensive C++ OOP concepts.\n";
+                cout << "Perfect for academic projects and learning! " << getIcon("bank") << "\n";
+                return;
+            }
+            
+            default: {
+                cout << getIcon("error") << " Invalid choice! Please select 1-4.\n";
+                break;
+            }
+        }
+        
+        cout << "\nPress Enter to continue...";
+        cin.ignore();
+        cin.get();
+    }
+}
+
+//================================ MODE SELECTION ================================
+
+void displayWelcomeScreen() {
+    cout << "\n";
+    cout << "========================================\n";
+    cout << "         " << getIcon("bank") << " SECURE BANK SYSTEM         \n";
+    cout << "========================================\n";
+    cout << "    Advanced C++ OOP Banking System    \n";
+    cout << "========================================\n";
+    cout << "\nAvailable Modes:\n";
+    cout << "1. " << getIcon("register") << " CLI Mode  - Command Line Interface\n";
+    cout << "2. " << getIcon("login") << " Web Mode  - Browser Interface\n";
+    cout << "3. " << getIcon("help") << " Help      - Show OOP concepts\n";
+    cout << "4. " << getIcon("exit") << " Exit      - Quit application\n";
+    cout << "\n========================================\n";
+    cout << "Select mode (1-4): ";
+}
+
+void showOOPConcepts() {
+    cout << "\n" << getIcon("help") << " C++ OOP Concepts Demonstrated in this System:\n";
+    cout << "================================================\n";
+    cout << getIcon("success") << " Classes & Objects        - Person, User, Account, Transaction, BankSystem\n";
+    cout << getIcon("success") << " Inheritance              - User inherits from abstract Person class\n";
+    cout << getIcon("success") << " Polymorphism             - Virtual functions and method overriding\n";
+    cout << getIcon("success") << " Encapsulation            - Private/Protected members with public interface\n";
+    cout << getIcon("success") << " Abstraction              - Abstract Person class with pure virtual functions\n";
+    cout << getIcon("success") << " Composition              - User HAS-A Account relationship\n";
+    cout << getIcon("success") << " Aggregation              - BankSystem contains multiple User objects\n";
+    cout << getIcon("success") << " Operator Overloading     - += for deposits, -= for withdrawals, = assignment\n";
+    cout << getIcon("success") << " Static Members & Methods - Class-level data and functions\n";
+    cout << getIcon("success") << " Templates                - Generic findUser<T>() method\n";
+    cout << getIcon("success") << " STL Containers           - vector for transactions, map for users\n";
+    cout << getIcon("success") << " Constructor/Destructor   - Proper object lifecycle management\n";
+    cout << getIcon("success") << " Copy Constructor         - Deep copying for complex objects\n";
+    cout << getIcon("success") << " Assignment Operator      - Safe object assignment\n";
+    cout << getIcon("success") << " Friend Classes           - Controlled access to private members\n";
+    cout << getIcon("success") << " Dynamic Memory           - new/delete for Account objects\n";
+    cout << getIcon("success") << " File I/O & Persistence   - Data saved to local file storage\n";
+    cout << "\n" << getIcon("bank") << " Educational Features:\n";
+    cout << "• Single file implementation for easy submission\n";
+    cout << "• Both CLI and Web interfaces demonstrating same OOP backend\n";
+    cout << "• Comprehensive banking operations with transaction history\n";
+    cout << "• Modern C++ features with clean, readable code structure\n";
+    cout << "• Cross-platform compatibility (Windows/Linux)\n";
+    cout << "• Persistent data storage with encryption\n";
+    cout << "\nPress Enter to continue...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+//================================ MAIN APPLICATION ================================
+
+int main(int argc, char* argv[]) {
+    // Quick command line support (for advanced users)
+    if (argc > 1) {
+        string arg = argv[1];
+        if (arg == "--cli" || arg == "-c") {
+            runCLI();
+            return 0;
+        } else if (arg == "--web" || arg == "-w") {
+            // Skip menu, go directly to web mode
+            cout << "🌐 Starting Web Banking Application directly...\n\n";
+            goto web_mode;
+        }
+    }
+    
+    // Interactive Mode Selection
+    int choice;
+    while (true) {
+        displayWelcomeScreen();
+        
+        // Clear input buffer and read choice
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\n❌ Invalid input! Please enter a number (1-4).\n";
+            cout << "Press Enter to continue...";
+            cin.get();
+            continue;
+        }
+        
+        // Clear remaining input buffer
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
+        switch (choice) {
+            case 1: { // CLI Mode
+                cout << "\n💻 Starting CLI Banking System...\n";
+                runCLI();
+                return 0;
+            }
+            
+            case 2: { // Web Mode
+                cout << "\n🌐 Starting Web Banking Application...\n";
+                break; // Exit switch to start web mode
+            }
+            
+            case 3: { // Help/OOP Concepts
+                showOOPConcepts();
+                continue; // Show menu again
+            }
+            
+            case 4: { // Exit
+                cout << "\n� Thank you for exploring SecureBank!\n";
+                cout << "This system showcased comprehensive C++ OOP concepts.\n";
+                cout << "Perfect for academic projects and learning! 🎓\n";
+                return 0;
+            }
+            
+            default: {
+                cout << "\n❌ Invalid choice! Please select 1-4.\n";
+                cout << "Press Enter to continue...";
+                cin.get();
+                continue;
+            }
+        }
+        
+        // If we reach here, user chose Web Mode (case 2)
+        break;
+    }
+    
+    web_mode:
+    // Create bank system object - Object creation
+    BankSystem bank("SecureBank");
+    
+    // Display static information
+    User::displayBankInfo();
+    
     crow::SimpleApp app;
-    std::string exe_dir = get_executable_dir();
-    std::cout << "📂 Executable directory: " << exe_dir << std::endl;
+    string exe_dir = get_executable_dir();
+    cout << "📂 Executable directory: " << exe_dir << endl;
 
     // Check if public folder exists using absolute path
-    std::string index_path = get_file_path("public/index.html");
-    std::ifstream test_file(index_path);
-    if (!test_file.is_open())
-    {
-        std::cerr << "⚠️  Warning: " << index_path << " not found!" << std::endl;
-        std::cerr << "   This usually happens when Task Scheduler runs from wrong directory" << std::endl;
-    }
-    else
-    {
-        std::cout << "✅ Found: " << index_path << std::endl;
+    string index_path = get_file_path("public/index.html");
+    ifstream test_file(index_path);
+    if (!test_file.is_open()) {
+        cerr << "⚠️  Warning: " << index_path << " not found!" << endl;
+        cerr << "   This usually happens when Task Scheduler runs from wrong directory" << endl;
+    } else {
+        cout << "✅ Found: " << index_path << endl;
         test_file.close();
     }
 
     // Route for the main page (index/signup)
     CROW_ROUTE(app, "/")
-    ([](const crow::request &req)
-     { return crow::response(200, read_file("index.html")); });
+    ([](const crow::request& req) {
+        return crow::response(200, read_file("index.html"));
+    });
 
     // Route for login page
     CROW_ROUTE(app, "/login")
-    ([](const crow::request &req)
-     { return crow::response(200, read_file("login.html")); });
+    ([](const crow::request& req) {
+        return crow::response(200, read_file("login.html"));
+    });
 
     // Route for dashboard page
     CROW_ROUTE(app, "/dashboard")
-    ([](const crow::request &req)
-     { return crow::response(200, read_file("dashboard.html")); });
+    ([](const crow::request& req) {
+        return crow::response(200, read_file("dashboard.html"));
+    });
 
-    // API route for login
-    CROW_ROUTE(app, "/api/login").methods("POST"_method)([](const crow::request &req)
-                                                         {
+    // API route for login - Using OOP objects
+    CROW_ROUTE(app, "/api/login").methods("POST"_method)
+    ([&bank](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
             return crow::response(400, "{\"success\": false, \"message\": \"Invalid JSON\"}");
         }
 
-        std::string email = body["email"].s();
-        std::string password = body["password"].s();
+        string email = body["email"].s();
+        string password = body["password"].s();
 
-        // Check credentials
-        auto user_it = users.find(email);
-        if (user_it != users.end() && user_it->second.password == password) {
-            // Generate token
-            std::string token = generate_token();
-            sessions[token] = email;
-            
+        // Use bank system object for authentication
+        string token = bank.authenticateUser(email, password);
+        
+        if (!token.empty()) {
             crow::json::wvalue response;
             response["success"] = true;
             response["token"] = token;
             response["message"] = "Login successful";
-            
             return crow::response(200, response.dump());
         } else {
             crow::json::wvalue response;
             response["success"] = false;
             response["message"] = "Invalid email or password";
-            
             return crow::response(401, response.dump());
-        } });
+        }
+    });
 
-    // API route for user data
+    // API route for user data - Demonstrating object interaction
     CROW_ROUTE(app, "/api/user-data")
-    ([](const crow::request &req)
-     {
-        std::string auth_header = req.get_header_value("Authorization");
+    ([&bank](const crow::request& req) {
+        string auth_header = req.get_header_value("Authorization");
         if (auth_header.substr(0, 7) != "Bearer ") {
             return crow::response(401, "{\"error\": \"Unauthorized\"}");
         }
         
-        std::string token = auth_header.substr(7);
-        auto session_it = sessions.find(token);
-        if (session_it == sessions.end()) {
-            return crow::response(401, "{\"error\": \"Invalid token\"}");
-        }
+        string token = auth_header.substr(7);
+        User* user = bank.getUserByToken(token);
         
-        std::string email = session_it->second;
-        auto user_it = users.find(email);
-        if (user_it == users.end()) {
+        if (user && user->getAccount()) {
+            crow::json::wvalue response;
+            response["name"] = user->getName();
+            response["email"] = user->getEmail();
+            response["balance"] = user->getAccount()->getBalance();
+            response["accountNumber"] = user->getAccount()->getAccountNumber();
+            response["accountType"] = user->getAccount()->getAccountType();
+            
+            return crow::response(200, response.dump());
+        } else {
             return crow::response(404, "{\"error\": \"User not found\"}");
         }
+    });
+
+    // API route for deposit
+    CROW_ROUTE(app, "/api/deposit").methods("POST"_method)
+    ([&bank](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        string auth_header = req.get_header_value("Authorization");
         
-        crow::json::wvalue response;
-        response["name"] = user_it->second.name;
-        response["email"] = user_it->second.email;
-        response["balance"] = user_it->second.balance;
+        if (auth_header.substr(0, 7) != "Bearer ") {
+            return crow::response(401, "{\"error\": \"Unauthorized\"}");
+        }
         
-        return crow::response(200, response.dump()); });
+        string token = auth_header.substr(7);
+        User* user = bank.getUserByToken(token);
+        
+        if (user && body) {
+            double amount = body["amount"].d();
+            if (user->makeDeposit(amount)) {
+                crow::json::wvalue response;
+                response["success"] = true;
+                response["message"] = "Deposit successful";
+                response["newBalance"] = user->getAccount()->getBalance();
+                return crow::response(200, response.dump());
+            }
+        }
+        
+        return crow::response(400, "{\"error\": \"Deposit failed\"}");
+    });
+
+    // API route for withdrawal
+    CROW_ROUTE(app, "/api/withdraw").methods("POST"_method)
+    ([&bank](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        string auth_header = req.get_header_value("Authorization");
+        
+        if (auth_header.substr(0, 7) != "Bearer ") {
+            return crow::response(401, "{\"error\": \"Unauthorized\"}");
+        }
+        
+        string token = auth_header.substr(7);
+        User* user = bank.getUserByToken(token);
+        
+        if (user && body) {
+            double amount = body["amount"].d();
+            if (user->makeWithdrawal(amount)) {
+                crow::json::wvalue response;
+                response["success"] = true;
+                response["message"] = "Withdrawal successful";
+                response["newBalance"] = user->getAccount()->getBalance();
+                return crow::response(200, response.dump());
+            } else {
+                return crow::response(400, "{\"error\": \"Insufficient funds or invalid amount\"}");
+            }
+        }
+        
+        return crow::response(400, "{\"error\": \"Withdrawal failed\"}");
+    });
 
     // Route for CSS file
     CROW_ROUTE(app, "/style.css")
-    ([](const crow::request &req)
-     { return crow::response(200, read_file("style.css")); });
+    ([](const crow::request& req) {
+        return crow::response(200, read_file("style.css"));
+    });
 
     // Start the server in a separate thread so we can open browser after startup
-    std::thread server_thread([&app]()
-                              { app.port(8080).multithreaded().run(); });
+    thread server_thread([&app]() {
+        app.port(8080).multithreaded().run();
+    });
 
     // Wait a moment for server to start, then open browser
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    std::cout << "🌐 Opening browser..." << std::endl;
+    this_thread::sleep_for(chrono::milliseconds(2000));
+    cout << "🌐 Opening browser..." << endl;
     open_browser("http://localhost:8080");
 
     // Keep the main thread alive
     server_thread.join();
+    
+    return 0;
 }
