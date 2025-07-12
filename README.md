@@ -1,16 +1,6 @@
-# 🏦 SecureBank - Modern C++ Banking Syste## 🚀 Quick Start
+# 🏦 SecureBank-CPP - Modern C++ Banking System
 
-```bash
-cd crow-bank-app/
-./build.sh linux    # For Linux
-./build.sh windows  # For Windows cross-compilation
-```
-
-## 🛠️ Development Notes
-
-_Developed on Linux with KVM-based Windows testing. Cross-platform compatibility thoroughly tested._
-
-## 📝 Noterehensive banking application built with modern C++ demonstrating advanced Object-Oriented Programming concepts. Features both CLI and Web interfaces with cross-platform compatibility.
+A comprehensive banking application built with modern C++ demonstrating advanced Object-Oriented Programming concepts. Features both CLI and Web interfaces with cross-platform compatibility.
 
 ## 🚀 Current Status
 
