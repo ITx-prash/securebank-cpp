@@ -160,6 +160,7 @@ private:
     }
 
 public:
+    // Constructor for new transactions
     Transaction(string t, double a) : type(t), amount(a)
     {
         transactionId = generateTransactionId();
@@ -167,6 +168,10 @@ public:
         timestamp = ctime(&now);
         timestamp.pop_back(); // Remove newline
     }
+
+    // Constructor for loading transactions from file
+    Transaction(string id, string t, double a, string ts)
+        : transactionId(id), type(t), amount(a), timestamp(ts) {}
 
     // Getter methods
     string getId() const { return transactionId; }
@@ -332,6 +337,9 @@ public:
     Account *getAccount() const { return account; }
     vector<Transaction> getTransactions() const { return transactions; }
     string getPassword() const { return password; } // For file storage
+
+    // Setter method for loading detailed transactions from file
+    void setTransactions(const vector<Transaction> &trans) { transactions = trans; }
 
     // Static method
     static void displayBankInfo()
@@ -663,7 +671,7 @@ bool saveUsersToFile(const map<string, User> &users)
             return false;
         }
 
-        // Enhanced format: email|name|phone|encrypted_password|account_number|account_type|balance|transaction_history
+        // Enhanced format: email|name|phone|encrypted_password|account_number|account_type|balance|transaction_history_count|transaction_history|detailed_transactions_count|detailed_transactions
         for (const auto &pair : users)
         {
             const User &user = pair.second;
@@ -677,13 +685,25 @@ bool saveUsersToFile(const map<string, User> &users)
                      << user.getAccount()->getAccountType() << "|"
                      << fixed << setprecision(2) << user.getAccount()->getBalance() << "|";
 
-                // Save transaction history
+                // Save basic transaction history
                 auto history = user.getAccount()->getTransactionHistory();
                 file << history.size() << "|";
                 for (const auto &trans : history)
                 {
                     file << trans << ";";
                 }
+                file << "|";
+
+                // Save detailed transactions
+                auto detailedTransactions = user.getTransactions();
+                file << detailedTransactions.size() << "|";
+                for (const auto &trans : detailedTransactions)
+                {
+                    file << trans.getId() << "~" << trans.getType() << "~"
+                         << fixed << setprecision(2) << trans.getAmount() << "~"
+                         << trans.getTimestamp() << ";";
+                }
+
                 file << "\n"; // Use explicit \n instead of endl
             }
         }
@@ -744,8 +764,8 @@ bool loadUsersFromFile(map<string, User> &users, int &totalUsers)
                     user.getAccount()->setBalance(balance);
                     user.getAccount()->setAccountNumber(accountNum);
 
-                    // Load transaction history if available (for backward compatibility)
-                    if (getline(ss, transCountStr, '|') && getline(ss, transactionsStr))
+                    // Load basic transaction history if available (for backward compatibility)
+                    if (getline(ss, transCountStr, '|') && getline(ss, transactionsStr, '|'))
                     {
                         transCountStr = trim(transCountStr);
                         transactionsStr = trim(transactionsStr);
@@ -761,6 +781,39 @@ bool loadUsersFromFile(map<string, User> &users, int &totalUsers)
                                 history.push_back(trim(transaction));
                             }
                             user.getAccount()->setTransactionHistory(history);
+                        }
+                    }
+
+                    // Load detailed transactions if available
+                    string detailedCountStr, detailedTransStr;
+                    if (getline(ss, detailedCountStr, '|') && getline(ss, detailedTransStr))
+                    {
+                        detailedCountStr = trim(detailedCountStr);
+                        detailedTransStr = trim(detailedTransStr);
+
+                        int detailedCount = stoi(detailedCountStr);
+                        if (detailedCount > 0)
+                        {
+                            vector<Transaction> detailedTransactions;
+                            stringstream detailedSS(detailedTransStr);
+                            string detailedTransaction;
+
+                            while (getline(detailedSS, detailedTransaction, ';') && !detailedTransaction.empty())
+                            {
+                                stringstream transFieldSS(detailedTransaction);
+                                string id, type, amountStr, timestamp;
+
+                                if (getline(transFieldSS, id, '~') &&
+                                    getline(transFieldSS, type, '~') &&
+                                    getline(transFieldSS, amountStr, '~') &&
+                                    getline(transFieldSS, timestamp))
+                                {
+                                    double amount = stod(trim(amountStr));
+                                    detailedTransactions.push_back(
+                                        Transaction(trim(id), trim(type), amount, trim(timestamp)));
+                                }
+                            }
+                            user.setTransactions(detailedTransactions);
                         }
                     }
                 }
