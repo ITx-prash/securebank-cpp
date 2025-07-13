@@ -7,48 +7,103 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body
-    class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center"
+    class="bg-slate-900 min-h-screen text-slate-100 relative overflow-hidden flex items-center justify-center"
+    style="background-color: #0b1222"
   >
-    <div class="max-w-md w-full mx-4">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 bg-dots opacity-20 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-md w-full mx-4">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-indigo-600">🏦 SecureBank</h1>
-        <p class="mt-2 text-gray-600">Sign in to your account</p>
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center bg-slate-800/50"
+          >
+            <span class="text-white font-bold text-2xl">🏦</span>
+          </div>
+        </div>
+        <h1
+          class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+        >
+          SecureBank
+        </h1>
+        <p class="mt-2 text-slate-400">Sign in to your account</p>
       </div>
 
       <!-- Login Form -->
-      <div class="bg-white rounded-lg shadow-xl p-8">
+      <div
+        class="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/30"
+      >
         <form id="loginForm" class="space-y-6">
           <div>
             <label
               for="loginEmail"
-              class="block text-sm font-medium text-gray-700"
+              class="block text-sm font-medium text-slate-300 mb-2"
               >Email Address</label
             >
-            <input
-              type="email"
-              id="loginEmail"
-              name="email"
-              required
-              class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter your email address"
-            />
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="email"
+                id="loginEmail"
+                name="email"
+                required
+                class="input-dark block w-full pl-10 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                placeholder="Enter your email address"
+              />
+            </div>
           </div>
 
           <div>
             <label
               for="loginPassword"
-              class="block text-sm font-medium text-gray-700"
+              class="block text-sm font-medium text-slate-300 mb-2"
               >Password</label
             >
-            <input
-              type="password"
-              id="loginPassword"
-              name="password"
-              required
-              class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter your password"
-            />
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  class="w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                required
+                class="input-dark block w-full pl-10 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                placeholder="Enter your password"
+              />
+            </div>
           </div>
 
           <div class="flex items-center justify-between">
@@ -57,39 +112,73 @@
                 id="remember"
                 name="remember"
                 type="checkbox"
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                class="h-4 w-4 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-800"
               />
-              <label for="remember" class="ml-2 block text-sm text-gray-900"
+              <label for="remember" class="ml-2 block text-sm text-slate-300"
                 >Remember me</label
               >
             </div>
-            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500"
+            <a
+              href="#"
+              class="text-sm text-blue-400 hover:text-blue-300 transition-colors"
               >Forgot password?</a
             >
           </div>
 
           <button
             type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            class="btn-gradient w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300 flex items-center justify-center space-x-2"
           >
-            Sign In
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
+            <span>Sign In</span>
           </button>
         </form>
 
         <!-- Error Message -->
         <div
           id="errorMessage"
-          class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md hidden"
+          class="mt-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg hidden backdrop-blur-sm"
         >
-          <p class="text-sm"></p>
+          <div class="flex items-center space-x-2">
+            <svg
+              class="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <p class="text-sm"></p>
+          </div>
         </div>
 
-        <p class="mt-6 text-center text-sm text-gray-500">
-          Don't have an account?
-          <a href="/" class="text-indigo-600 hover:text-indigo-500 font-medium"
-            >Sign up</a
-          >
-        </p>
+        <div class="mt-6 text-center">
+          <p class="text-sm text-slate-400">
+            Don't have an account?
+            <a
+              href="/signup"
+              class="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+              >Sign up here</a
+            >
+          </p>
+        </div>
       </div>
     </div>
 
@@ -147,5 +236,81 @@
         }
       });
     </script>
+
+    <style>
+      /* Login page specific animations */
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .glass-card {
+        animation: slideInUp 0.6s ease-out;
+      }
+
+      /* Override button gradient with subtle shadow */
+      .btn-gradient {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient:hover {
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Enhanced focus states for login form */
+      .input-dark:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      }
+
+      /* Custom checkbox styling */
+      input[type="checkbox"] {
+        appearance: none;
+        background-color: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+
+      input[type="checkbox"]:checked {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6 10.293l7.146-7.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+      }
+
+      /* Forgot password link hover effect */
+      a[href="#"]:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(59, 130, 246, 0.5);
+        text-underline-offset: 4px;
+      }
+
+      /* Loading state for button */
+      .btn-gradient:disabled {
+        background: linear-gradient(135deg, #64748b, #475569);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Mobile responsiveness */
+      @media (max-width: 640px) {
+        .glass-card {
+          margin: 1rem;
+          padding: 1.5rem;
+        }
+
+        .relative.z-10 {
+          padding: 0 1rem;
+        }
+      }
+    </style>
   </body>
 </html>

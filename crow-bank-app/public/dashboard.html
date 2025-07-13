@@ -8,16 +8,16 @@
   </head>
   <body
     class="bg-slate-900 min-h-screen text-slate-100 relative overflow-x-hidden"
+    style="background-color: #0b1222"
   >
     <!-- Animated Background -->
-    <div class="fixed inset-0 bg-dots opacity-30 pointer-events-none"></div>
-    <div
-      class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"
-    ></div>
+    <div class="fixed inset-0 bg-dots opacity-20 pointer-events-none"></div>
 
     <!-- Navigation -->
-    <nav class="glass sticky top-0 z-40 border-b border-slate-700/50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav
+      class="bg-slate-800/50 backdrop-blur-sm sticky top-0 z-40 border-b border-slate-700/30"
+    >
+      <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center space-x-3">
             <div
@@ -39,7 +39,7 @@
             </div>
             <button
               id="logoutBtn"
-              class="glass-button p-3 rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group"
+              class="bg-slate-700/50 hover:bg-red-500/20 p-3 rounded-lg text-slate-300 hover:text-red-400 transition-all duration-200 group"
               title="Logout"
             >
               <svg
@@ -62,17 +62,17 @@
     </nav>
 
     <div
-      class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
+      class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
     >
-      <!-- Account Overview Cards -->
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8"
-      >
+      <!-- Compact Account Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <!-- Balance Card -->
-        <div class="glass-card rounded-xl p-6 card-hover">
-          <div class="flex items-center justify-between mb-4">
+        <div
+          class="glass-card rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div class="flex items-center justify-between mb-3">
             <div
-              class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center"
+              class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center"
             >
               <svg
                 class="w-6 h-6 text-white"
@@ -90,7 +90,7 @@
             </div>
             <button
               id="refreshBtn"
-              class="text-slate-400 hover:text-blue-400 transition-colors"
+              class="text-slate-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-slate-700/50"
             >
               <svg
                 class="w-5 h-5"
@@ -111,20 +111,19 @@
             <p class="text-slate-400 text-sm font-medium mb-1">
               Current Balance
             </p>
-            <p
-              id="balance"
-              class="text-2xl sm:text-3xl font-bold text-emerald-400"
-            >
+            <p id="balance" class="text-2xl font-bold text-emerald-400">
               $0.00
             </p>
           </div>
         </div>
 
         <!-- Account Info Card -->
-        <div class="glass-card rounded-xl p-6 card-hover">
-          <div class="flex items-center mb-4">
+        <div
+          class="glass-card rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div class="flex items-center mb-3">
             <div
-              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
             >
               <svg
                 class="w-6 h-6 text-white"
@@ -145,7 +144,10 @@
             <p class="text-slate-400 text-sm font-medium mb-1">
               Account Number
             </p>
-            <p id="accountNumber" class="text-lg font-semibold text-slate-200">
+            <p
+              id="accountNumber"
+              class="text-lg font-semibold text-slate-200 font-mono"
+            >
               Loading...
             </p>
           </div>
@@ -153,11 +155,11 @@
 
         <!-- Account Holder Card -->
         <div
-          class="glass-card rounded-xl p-6 card-hover sm:col-span-2 lg:col-span-1"
+          class="glass-card rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
-          <div class="flex items-center mb-4">
+          <div class="flex items-center mb-3">
             <div
-              class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"
+              class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center"
             >
               <svg
                 class="w-6 h-6 text-white"
@@ -186,37 +188,108 @@
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="glass-card rounded-xl mb-6 sm:mb-8 p-2">
-        <nav class="flex space-x-2 overflow-x-auto">
+      <div class="bg-slate-800/50 rounded-lg p-1 mb-3 sm:mb-4">
+        <nav class="flex space-x-1 overflow-x-auto scrollbar-hide">
           <button
             data-section="balance"
-            class="nav-tab active flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
+            class="nav-tab active flex-shrink-0 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 flex items-center justify-center space-x-1 min-w-0"
           >
-            <span class="hidden sm:inline">📊 </span>Overview
+            <svg
+              class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline">Overview</span>
           </button>
           <button
             data-section="deposit"
-            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
+            class="nav-tab flex-shrink-0 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 flex items-center justify-center space-x-1 min-w-0"
           >
-            <span class="hidden sm:inline">💰 </span>Deposit
+            <svg
+              class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline">Deposit</span>
           </button>
           <button
             data-section="withdraw"
-            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
+            class="nav-tab flex-shrink-0 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 flex items-center justify-center space-x-1 min-w-0"
           >
-            <span class="hidden sm:inline">💸 </span>Withdraw
+            <svg
+              class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20 12H4"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline">Withdraw</span>
           </button>
           <button
             data-section="transfer"
-            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
+            class="nav-tab flex-shrink-0 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 flex items-center justify-center space-x-1 min-w-0"
           >
-            <span class="hidden sm:inline">🔄 </span>Transfer
+            <svg
+              class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline">Transfer</span>
           </button>
           <button
             data-section="history"
-            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
+            class="nav-tab flex-shrink-0 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-300 flex items-center justify-center space-x-1 min-w-0"
           >
-            <span class="hidden sm:inline">📈 </span>History
+            <svg
+              class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            <span class="hidden sm:inline">History</span>
           </button>
         </nav>
       </div>
@@ -229,16 +302,9 @@
           <!-- Account Details -->
           <div class="lg:col-span-2">
             <div class="glass-card rounded-xl p-6">
-              <h2
-                class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
-              >
-                <span
-                  class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3"
-                >
-                  <span class="text-white text-sm">📋</span>
-                </span>
+              <h3 class="text-xl font-semibold text-slate-100 mb-6">
                 Account Details
-              </h2>
+              </h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div class="space-y-4">
                   <div class="border-l-4 border-blue-500 pl-4">
@@ -269,7 +335,7 @@
                     <p class="text-slate-400 text-sm">Current Balance</p>
                     <p
                       id="balanceDetail"
-                      class="text-emerald-400 font-bold text-lg"
+                      class="text-emerald-400 font-bold text-xl"
                     >
                       $0.00
                     </p>
@@ -279,34 +345,27 @@
             </div>
           </div>
 
-          <!-- Recent Activity Summary -->
+          <!-- Quick Stats -->
           <div class="glass-card rounded-xl p-6">
-            <h3
-              class="text-lg font-semibold text-slate-100 mb-4 flex items-center"
-            >
-              <span
-                class="w-6 h-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded mr-2 flex items-center justify-center"
-              >
-                <span class="text-white text-xs">📊</span>
-              </span>
+            <h3 class="text-xl font-semibold text-slate-100 mb-6">
               Quick Stats
             </h3>
             <div class="space-y-4">
               <div
-                class="flex justify-between items-center py-2 border-b border-slate-700"
+                class="flex justify-between items-center py-3 border-b border-slate-700"
               >
-                <span class="text-slate-400 text-sm">Total Deposits</span>
-                <span class="text-emerald-400 font-medium">$0.00</span>
+                <span class="text-slate-400">Total Deposits</span>
+                <span class="text-emerald-400 font-semibold">$0.00</span>
               </div>
               <div
-                class="flex justify-between items-center py-2 border-b border-slate-700"
+                class="flex justify-between items-center py-3 border-b border-slate-700"
               >
-                <span class="text-slate-400 text-sm">Total Withdrawals</span>
-                <span class="text-red-400 font-medium">$0.00</span>
+                <span class="text-slate-400">Total Withdrawals</span>
+                <span class="text-red-400 font-semibold">$0.00</span>
               </div>
-              <div class="flex justify-between items-center py-2">
-                <span class="text-slate-400 text-sm">Transactions</span>
-                <span class="text-blue-400 font-medium">0</span>
+              <div class="flex justify-between items-center py-3">
+                <span class="text-slate-400">Net Balance</span>
+                <span class="text-blue-400 font-semibold">$0.00</span>
               </div>
             </div>
           </div>
@@ -315,18 +374,30 @@
 
       <!-- Deposit Section -->
       <div id="depositSection" class="dashboard-section">
-        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
-          <h2
+        <div class="glass-card rounded-xl p-6 max-w-md mx-auto">
+          <h3
             class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
           >
             <span
               class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg flex items-center justify-center mr-3"
             >
-              <span class="text-white text-sm">💰</span>
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+              </svg>
             </span>
             Deposit Money
-          </h2>
-          <form id="depositForm" class="space-y-6">
+          </h3>
+          <form id="depositForm" class="space-y-4">
             <div>
               <label
                 for="depositAmount"
@@ -338,7 +409,7 @@
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-slate-400 text-lg">$</span>
+                  <span class="text-slate-400">$</span>
                 </div>
                 <input
                   type="number"
@@ -347,7 +418,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   placeholder="0.00"
                 />
               </div>
@@ -356,7 +427,7 @@
               type="submit"
               class="btn-success w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              💰 Deposit Funds
+              Deposit Funds
             </button>
           </form>
         </div>
@@ -364,18 +435,30 @@
 
       <!-- Withdraw Section -->
       <div id="withdrawSection" class="dashboard-section">
-        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
-          <h2
+        <div class="glass-card rounded-xl p-6 max-w-md mx-auto">
+          <h3
             class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
           >
             <span
               class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3"
             >
-              <span class="text-white text-sm">💸</span>
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 12H4"
+                ></path>
+              </svg>
             </span>
             Withdraw Money
-          </h2>
-          <form id="withdrawForm" class="space-y-6">
+          </h3>
+          <form id="withdrawForm" class="space-y-4">
             <div>
               <label
                 for="withdrawAmount"
@@ -387,7 +470,7 @@
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-slate-400 text-lg">$</span>
+                  <span class="text-slate-400">$</span>
                 </div>
                 <input
                   type="number"
@@ -396,7 +479,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-red-500 focus:outline-none"
                   placeholder="0.00"
                 />
               </div>
@@ -405,7 +488,7 @@
               type="submit"
               class="btn-danger w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              💸 Withdraw Funds
+              Withdraw Funds
             </button>
           </form>
         </div>
@@ -413,18 +496,30 @@
 
       <!-- Transfer Section -->
       <div id="transferSection" class="dashboard-section">
-        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
-          <h2
+        <div class="glass-card rounded-xl p-6 max-w-md mx-auto">
+          <h3
             class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
           >
             <span
               class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3"
             >
-              <span class="text-white text-sm">🔄</span>
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                ></path>
+              </svg>
             </span>
             Transfer Money
-          </h2>
-          <form id="transferForm" class="space-y-6">
+          </h3>
+          <form id="transferForm" class="space-y-4">
             <div>
               <label
                 for="transferEmail"
@@ -437,7 +532,7 @@
                 id="transferEmail"
                 name="email"
                 required
-                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="recipient@example.com"
               />
             </div>
@@ -452,7 +547,7 @@
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-slate-400 text-lg">$</span>
+                  <span class="text-slate-400">$</span>
                 </div>
                 <input
                   type="number"
@@ -461,7 +556,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="0.00"
                 />
               </div>
@@ -470,7 +565,7 @@
               type="submit"
               class="btn-gradient w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              🔄 Transfer Funds
+              Transfer Funds
             </button>
           </form>
         </div>
@@ -479,21 +574,33 @@
       <!-- History Section -->
       <div id="historySection" class="dashboard-section">
         <div class="glass-card rounded-xl p-6">
-          <h2
+          <h3
             class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
           >
             <span
               class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mr-3"
             >
-              <span class="text-white text-sm">📈</span>
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                ></path>
+              </svg>
             </span>
             Transaction History
-          </h2>
+          </h3>
           <div id="transactionHistory" class="space-y-4">
             <div class="flex items-center justify-center py-12">
               <div class="text-center">
                 <div
-                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400 mx-auto mb-4"
                 ></div>
                 <p class="text-slate-400">Loading transaction history...</p>
               </div>
@@ -516,13 +623,12 @@
 
       .dashboard-section.active {
         display: block;
+        animation: slideIn 0.3s ease-out;
       }
 
       .nav-tab {
         color: #94a3b8;
         background: transparent;
-        position: relative;
-        transition: all 0.3s ease;
         border: 1px solid transparent;
       }
 
@@ -549,68 +655,6 @@
         box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
       }
 
-      .glass-button {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
-      .glass-button:hover {
-        background: rgba(30, 41, 59, 0.6);
-        border-color: rgba(148, 163, 184, 0.2);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .transaction-item {
-        padding: 16px;
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        border-radius: 12px;
-        margin-bottom: 12px;
-        transition: all 0.3s ease;
-      }
-
-      .transaction-item:hover {
-        background: rgba(30, 41, 59, 0.7);
-        transform: translateY(-1px);
-      }
-
-      .transaction-detail {
-        padding: 16px;
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        border-radius: 12px;
-        margin-bottom: 12px;
-        font-family: "JetBrains Mono", "Fira Code", monospace;
-        font-size: 0.875rem;
-        color: #e2e8f0;
-      }
-
-      .transaction-group {
-        margin-bottom: 32px;
-      }
-
-      .transaction-group h4 {
-        font-weight: 600;
-        margin-bottom: 16px;
-        color: #e2e8f0;
-        font-size: 1.125rem;
-      }
-
-      .form-field.error input {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-      }
-
-      .error-message {
-        color: #ef4444;
-        font-size: 0.875rem;
-        margin-top: 8px;
-      }
-
-      /* Custom animations */
       @keyframes slideIn {
         from {
           opacity: 0;
@@ -622,16 +666,14 @@
         }
       }
 
-      .dashboard-section.active {
-        animation: slideIn 0.3s ease-out;
+      /* Hide scrollbar but keep functionality */
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
-      /* Responsive navigation for mobile */
-      @media (max-width: 640px) {
-        .nav-tab {
-          font-size: 0.875rem;
-          padding: 12px 16px;
-        }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
       }
     </style>
   </body>

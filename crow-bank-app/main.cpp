@@ -1599,12 +1599,17 @@ web_mode:
         test_file.close();
     }
 
-    // Route for the main page (index/signup)
+    // Route for the main page (default login page)
     CROW_ROUTE(app, "/")
+    ([](const crow::request &req)
+     { return crow::response(200, read_file("login.html")); });
+
+    // Route for signup page
+    CROW_ROUTE(app, "/signup")
     ([](const crow::request &req)
      { return crow::response(200, read_file("index.html")); });
 
-    // Route for login page
+    // Route for login page (alias for root)
     CROW_ROUTE(app, "/login")
     ([](const crow::request &req)
      { return crow::response(200, read_file("login.html")); });
