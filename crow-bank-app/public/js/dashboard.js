@@ -77,6 +77,12 @@ class Dashboard {
     if (accountHolderElement)
       accountHolderElement.textContent = this.currentUser.name;
 
+    const accountHolderDetailElement = document.getElementById(
+      "accountHolderDetail"
+    );
+    if (accountHolderDetailElement)
+      accountHolderDetailElement.textContent = this.currentUser.name;
+
     const accountNumberDetailElement = document.getElementById(
       "accountNumberDetail"
     );
@@ -88,11 +94,63 @@ class Dashboard {
       balanceDetailElement.textContent = `$${this.currentUser.balance.toFixed(
         2
       )}`;
+
+    // Update Quick Stats
+    this.updateQuickStats();
+  }
+
+  async updateQuickStats() {
+    try {
+      // Get transaction data to calculate stats
+      const transactions = await window.api.getTransactions();
+      let totalDeposits = 0;
+      let totalWithdrawals = 0;
+      let transactionCount = 0;
+
+      // Calculate from detailed transactions if available
+      if (
+        transactions.detailedTransactions &&
+        transactions.detailedTransactions.length > 0
+      ) {
+        transactions.detailedTransactions.forEach((trans) => {
+          transactionCount++;
+          if (trans.type === "Deposit") {
+            totalDeposits += parseFloat(trans.amount);
+          } else if (trans.type === "Withdrawal") {
+            totalWithdrawals += parseFloat(trans.amount);
+          }
+        });
+      }
+
+      // Update Quick Stats display
+      const totalDepositsElement = document.querySelector(
+        ".text-emerald-400.font-medium"
+      );
+      if (totalDepositsElement) {
+        totalDepositsElement.textContent = `$${totalDeposits.toFixed(2)}`;
+      }
+
+      const totalWithdrawalsElement = document.querySelector(
+        ".text-red-400.font-medium"
+      );
+      if (totalWithdrawalsElement) {
+        totalWithdrawalsElement.textContent = `$${totalWithdrawals.toFixed(2)}`;
+      }
+
+      const transactionCountElement = document.querySelector(
+        ".text-blue-400.font-medium"
+      );
+      if (transactionCountElement) {
+        transactionCountElement.textContent = transactionCount.toString();
+      }
+    } catch (error) {
+      console.error("Failed to update quick stats:", error);
+    }
   }
 
   setupEventListeners() {
     // Navigation buttons
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
+    document.querySelectorAll(".nav-tab").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const section = e.target.dataset.section;
         this.showSection(section);
@@ -182,7 +240,7 @@ class Dashboard {
     }
 
     // Update navigation
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
+    document.querySelectorAll(".nav-tab").forEach((btn) => {
       btn.classList.remove("active");
     });
 

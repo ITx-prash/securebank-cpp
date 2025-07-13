@@ -6,38 +6,76 @@
     <title>SecureBank - Dashboard</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="bg-gray-50 min-h-screen">
+  <body
+    class="bg-slate-900 min-h-screen text-slate-100 relative overflow-x-hidden"
+  >
+    <!-- Animated Background -->
+    <div class="fixed inset-0 bg-dots opacity-30 pointer-events-none"></div>
+    <div
+      class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pointer-events-none"
+    ></div>
+
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
+    <nav class="glass sticky top-0 z-40 border-b border-slate-700/50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
-          <div class="flex items-center">
-            <h1 class="text-xl font-bold text-indigo-600">🏦 SecureBank</h1>
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-sm">🏦</span>
+            </div>
+            <h1
+              class="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+            >
+              SecureBank
+            </h1>
           </div>
           <div class="flex items-center space-x-4">
-            <span id="userName" class="text-gray-700 font-medium"
-              >Welcome, User</span
-            >
+            <div class="hidden sm:block">
+              <span id="userName" class="text-slate-300 font-medium"
+                >Welcome, User</span
+              >
+            </div>
             <button
               id="logoutBtn"
-              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+              class="glass-button p-3 rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group"
+              title="Logout"
             >
-              Logout
+              <svg
+                class="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                ></path>
+              </svg>
             </button>
           </div>
         </div>
       </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Account Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div
+      class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
+    >
+      <!-- Account Overview Cards -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8"
+      >
         <!-- Balance Card -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-green-100 rounded-md">
+        <div class="glass-card rounded-xl p-6 card-hover">
+          <div class="flex items-center justify-between mb-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center"
+            >
               <svg
-                class="w-6 h-6 text-green-600"
+                class="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -50,21 +88,46 @@
                 ></path>
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Current Balance</p>
-              <p id="balance" class="text-2xl font-semibold text-gray-900">
-                $0.00
-              </p>
-            </div>
+            <button
+              id="refreshBtn"
+              class="text-slate-400 hover:text-blue-400 transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div>
+            <p class="text-slate-400 text-sm font-medium mb-1">
+              Current Balance
+            </p>
+            <p
+              id="balance"
+              class="text-2xl sm:text-3xl font-bold text-emerald-400"
+            >
+              $0.00
+            </p>
           </div>
         </div>
 
         <!-- Account Info Card -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-blue-100 rounded-md">
+        <div class="glass-card rounded-xl p-6 card-hover">
+          <div class="flex items-center mb-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+            >
               <svg
-                class="w-6 h-6 text-blue-600"
+                class="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -77,21 +140,27 @@
                 ></path>
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Account Number</p>
-              <p id="accountNumber" class="text-lg font-semibold text-gray-900">
-                Loading...
-              </p>
-            </div>
+          </div>
+          <div>
+            <p class="text-slate-400 text-sm font-medium mb-1">
+              Account Number
+            </p>
+            <p id="accountNumber" class="text-lg font-semibold text-slate-200">
+              Loading...
+            </p>
           </div>
         </div>
 
-        <!-- Quick Balance Refresh -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-purple-100 rounded-md">
+        <!-- Account Holder Card -->
+        <div
+          class="glass-card rounded-xl p-6 card-hover sm:col-span-2 lg:col-span-1"
+        >
+          <div class="flex items-center mb-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"
+            >
               <svg
-                class="w-6 h-6 text-purple-600"
+                class="w-6 h-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -100,122 +169,144 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 ></path>
               </svg>
             </div>
-            <div class="ml-4">
-              <!-- <p class="text-sm font-medium text-gray-500">Last Updated</p> -->
-              <button
-                id="refreshBtn"
-                class="text-purple-600 hover:text-purple-700 font-medium cursor-pointer"
-              >
-                Refresh Now
-              </button>
-            </div>
+          </div>
+          <div>
+            <p class="text-slate-400 text-sm font-medium mb-1">
+              Account Holder
+            </p>
+            <p id="accountHolder" class="text-lg font-semibold text-slate-200">
+              Loading...
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Menu -->
-      <div class="bg-white rounded-lg shadow mb-8">
-        <nav class="flex space-x-8 px-6 py-4">
+      <!-- Navigation Tabs -->
+      <div class="glass-card rounded-xl mb-6 sm:mb-8 p-2">
+        <nav class="flex space-x-2 overflow-x-auto">
           <button
             data-section="balance"
-            class="nav-btn active px-3 py-2 text-sm font-medium hover:text-gray-700"
+            class="nav-tab active flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
           >
-            Balance Overview
+            <span class="hidden sm:inline">📊 </span>Overview
           </button>
           <button
             data-section="deposit"
-            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
           >
-            Deposit
+            <span class="hidden sm:inline">💰 </span>Deposit
           </button>
           <button
             data-section="withdraw"
-            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
           >
-            Withdraw
+            <span class="hidden sm:inline">💸 </span>Withdraw
           </button>
           <button
             data-section="transfer"
-            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
           >
-            Transfer
+            <span class="hidden sm:inline">🔄 </span>Transfer
           </button>
           <button
             data-section="history"
-            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+            class="nav-tab flex-1 px-4 sm:px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300"
           >
-            History
+            <span class="hidden sm:inline">📈 </span>History
           </button>
         </nav>
       </div>
 
       <!-- Dashboard Sections -->
 
-      <!-- Balance Section -->
+      <!-- Balance/Overview Section -->
       <div id="balanceSection" class="dashboard-section active">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">
-            Account Overview
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 class="text-sm font-medium text-gray-500 mb-2">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Account Details -->
+          <div class="lg:col-span-2">
+            <div class="glass-card rounded-xl p-6">
+              <h2
+                class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
+              >
+                <span
+                  class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3"
+                >
+                  <span class="text-white text-sm">📋</span>
+                </span>
                 Account Details
-              </h3>
-              <div class="space-y-2">
-                <p>
-                  <span class="font-medium">Account Holder:</span>
-                  <span id="accountHolder">Loading...</span>
-                </p>
-                <p>
-                  <span class="font-medium">Account Number:</span>
-                  <span id="accountNumberDetail">Loading...</span>
-                </p>
-                <p>
-                  <span class="font-medium">Account Type:</span>
-                  <span>Savings</span>
-                </p>
-                <p>
-                  <span class="font-medium">Current Balance:</span>
-                  <span id="balanceDetail" class="text-green-600 font-semibold"
-                    >$0.00</span
-                  >
-                </p>
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                  <div class="border-l-4 border-blue-500 pl-4">
+                    <p class="text-slate-400 text-sm">Account Holder</p>
+                    <p
+                      id="accountHolderDetail"
+                      class="text-slate-200 font-medium"
+                    >
+                      Loading...
+                    </p>
+                  </div>
+                  <div class="border-l-4 border-emerald-500 pl-4">
+                    <p class="text-slate-400 text-sm">Account Type</p>
+                    <p class="text-slate-200 font-medium">Savings Account</p>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="text-slate-400 text-sm">Account Number</p>
+                    <p
+                      id="accountNumberDetail"
+                      class="text-slate-200 font-medium font-mono"
+                    >
+                      Loading...
+                    </p>
+                  </div>
+                  <div class="border-l-4 border-amber-500 pl-4">
+                    <p class="text-slate-400 text-sm">Current Balance</p>
+                    <p
+                      id="balanceDetail"
+                      class="text-emerald-400 font-bold text-lg"
+                    >
+                      $0.00
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-500 mb-2">
-                Quick Actions
-              </h3>
-              <div class="space-y-2">
-                <button
-                  data-section="deposit"
-                  class="nav-btn w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-left"
-                >
-                  💰 Make Deposit
-                </button>
-                <button
-                  data-section="withdraw"
-                  class="nav-btn w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-left"
-                >
-                  💸 Withdraw Money
-                </button>
-                <button
-                  data-section="transfer"
-                  class="nav-btn w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-left"
-                >
-                  🔄 Transfer Funds
-                </button>
-                <button
-                  data-section="history"
-                  class="nav-btn w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-left"
-                >
-                  📊 View History
-                </button>
+          </div>
+
+          <!-- Recent Activity Summary -->
+          <div class="glass-card rounded-xl p-6">
+            <h3
+              class="text-lg font-semibold text-slate-100 mb-4 flex items-center"
+            >
+              <span
+                class="w-6 h-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded mr-2 flex items-center justify-center"
+              >
+                <span class="text-white text-xs">📊</span>
+              </span>
+              Quick Stats
+            </h3>
+            <div class="space-y-4">
+              <div
+                class="flex justify-between items-center py-2 border-b border-slate-700"
+              >
+                <span class="text-slate-400 text-sm">Total Deposits</span>
+                <span class="text-emerald-400 font-medium">$0.00</span>
+              </div>
+              <div
+                class="flex justify-between items-center py-2 border-b border-slate-700"
+              >
+                <span class="text-slate-400 text-sm">Total Withdrawals</span>
+                <span class="text-red-400 font-medium">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-2">
+                <span class="text-slate-400 text-sm">Transactions</span>
+                <span class="text-blue-400 font-medium">0</span>
               </div>
             </div>
           </div>
@@ -224,20 +315,30 @@
 
       <!-- Deposit Section -->
       <div id="depositSection" class="dashboard-section">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Deposit Money</h2>
-          <form id="depositForm" class="space-y-4">
+        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
+          <h2
+            class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
+          >
+            <span
+              class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg flex items-center justify-center mr-3"
+            >
+              <span class="text-white text-sm">💰</span>
+            </span>
+            Deposit Money
+          </h2>
+          <form id="depositForm" class="space-y-6">
             <div>
               <label
                 for="depositAmount"
-                class="block text-sm font-medium text-gray-700"
-                >Amount to Deposit</label
+                class="block text-sm font-medium text-slate-300 mb-2"
               >
-              <div class="mt-1 relative rounded-md shadow-sm">
+                Amount to Deposit
+              </label>
+              <div class="relative">
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-gray-500 sm:text-sm">$</span>
+                  <span class="text-slate-400 text-lg">$</span>
                 </div>
                 <input
                   type="number"
@@ -246,16 +347,16 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                   placeholder="0.00"
                 />
               </div>
             </div>
             <button
               type="submit"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md font-medium"
+              class="btn-success w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              Deposit Funds
+              💰 Deposit Funds
             </button>
           </form>
         </div>
@@ -263,20 +364,30 @@
 
       <!-- Withdraw Section -->
       <div id="withdrawSection" class="dashboard-section">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Withdraw Money</h2>
-          <form id="withdrawForm" class="space-y-4">
+        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
+          <h2
+            class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
+          >
+            <span
+              class="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3"
+            >
+              <span class="text-white text-sm">💸</span>
+            </span>
+            Withdraw Money
+          </h2>
+          <form id="withdrawForm" class="space-y-6">
             <div>
               <label
                 for="withdrawAmount"
-                class="block text-sm font-medium text-gray-700"
-                >Amount to Withdraw</label
+                class="block text-sm font-medium text-slate-300 mb-2"
               >
-              <div class="mt-1 relative rounded-md shadow-sm">
+                Amount to Withdraw
+              </label>
+              <div class="relative">
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-gray-500 sm:text-sm">$</span>
+                  <span class="text-slate-400 text-lg">$</span>
                 </div>
                 <input
                   type="number"
@@ -285,16 +396,16 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                   placeholder="0.00"
                 />
               </div>
             </div>
             <button
               type="submit"
-              class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-medium"
+              class="btn-danger w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              Withdraw Funds
+              💸 Withdraw Funds
             </button>
           </form>
         </div>
@@ -302,35 +413,46 @@
 
       <!-- Transfer Section -->
       <div id="transferSection" class="dashboard-section">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Transfer Money</h2>
-          <form id="transferForm" class="space-y-4">
+        <div class="glass-card rounded-xl p-6 sm:p-8 max-w-2xl mx-auto">
+          <h2
+            class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
+          >
+            <span
+              class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3"
+            >
+              <span class="text-white text-sm">🔄</span>
+            </span>
+            Transfer Money
+          </h2>
+          <form id="transferForm" class="space-y-6">
             <div>
               <label
                 for="transferEmail"
-                class="block text-sm font-medium text-gray-700"
-                >Recipient Email</label
+                class="block text-sm font-medium text-slate-300 mb-2"
               >
+                Recipient Email Address
+              </label>
               <input
                 type="email"
                 id="transferEmail"
                 name="email"
                 required
-                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                 placeholder="recipient@example.com"
               />
             </div>
             <div>
               <label
                 for="transferAmount"
-                class="block text-sm font-medium text-gray-700"
-                >Amount to Transfer</label
+                class="block text-sm font-medium text-slate-300 mb-2"
               >
-              <div class="mt-1 relative rounded-md shadow-sm">
+                Amount to Transfer
+              </label>
+              <div class="relative">
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
-                  <span class="text-gray-500 sm:text-sm">$</span>
+                  <span class="text-slate-400 text-lg">$</span>
                 </div>
                 <input
                   type="number"
@@ -339,16 +461,16 @@
                   step="0.01"
                   min="0.01"
                   required
-                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  class="input-dark block w-full pl-8 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
                   placeholder="0.00"
                 />
               </div>
             </div>
             <button
               type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium"
+              class="btn-gradient w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-300"
             >
-              Transfer Funds
+              🔄 Transfer Funds
             </button>
           </form>
         </div>
@@ -356,12 +478,26 @@
 
       <!-- History Section -->
       <div id="historySection" class="dashboard-section">
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">
+        <div class="glass-card rounded-xl p-6">
+          <h2
+            class="text-xl font-semibold text-slate-100 mb-6 flex items-center"
+          >
+            <span
+              class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mr-3"
+            >
+              <span class="text-white text-sm">📈</span>
+            </span>
             Transaction History
           </h2>
-          <div id="transactionHistory">
-            <p class="text-gray-500">Loading transaction history...</p>
+          <div id="transactionHistory" class="space-y-4">
+            <div class="flex items-center justify-center py-12">
+              <div class="text-center">
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"
+                ></div>
+                <p class="text-slate-400">Loading transaction history...</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -382,54 +518,120 @@
         display: block;
       }
 
-      .nav-btn {
-        color: #6b7280;
-        border-bottom: 2px solid transparent;
+      .nav-tab {
+        color: #94a3b8;
+        background: transparent;
+        position: relative;
         transition: all 0.3s ease;
+        border: 1px solid transparent;
       }
 
-      .nav-btn.active {
-        color: #4f46e5 !important;
-        border-bottom: 2px solid #4f46e5 !important;
+      .nav-tab:hover {
+        color: #e2e8f0;
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.2);
+        transform: translateY(-1px);
       }
 
-      .nav-btn:hover:not(.active) {
-        color: #374151;
+      .nav-tab.active {
+        color: #ffffff;
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.3),
+          rgba(29, 78, 216, 0.2)
+        );
+        border-color: rgba(59, 130, 246, 0.4);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      }
+
+      .nav-tab.active:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+      }
+
+      .glass-button {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .glass-button:hover {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(148, 163, 184, 0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .transaction-item {
-        padding: 8px 0;
-        border-bottom: 1px solid #e5e7eb;
+        padding: 16px;
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+      }
+
+      .transaction-item:hover {
+        background: rgba(30, 41, 59, 0.7);
+        transform: translateY(-1px);
       }
 
       .transaction-detail {
-        padding: 12px;
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        margin-bottom: 8px;
-        font-family: monospace;
+        padding: 16px;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        font-family: "JetBrains Mono", "Fira Code", monospace;
         font-size: 0.875rem;
+        color: #e2e8f0;
       }
 
       .transaction-group {
-        margin-bottom: 24px;
+        margin-bottom: 32px;
       }
 
       .transaction-group h4 {
         font-weight: 600;
-        margin-bottom: 12px;
-        color: #374151;
+        margin-bottom: 16px;
+        color: #e2e8f0;
+        font-size: 1.125rem;
       }
 
       .form-field.error input {
-        border-color: #dc3545;
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
       }
 
       .error-message {
-        color: #dc3545;
+        color: #ef4444;
         font-size: 0.875rem;
-        margin-top: 5px;
+        margin-top: 8px;
+      }
+
+      /* Custom animations */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .dashboard-section.active {
+        animation: slideIn 0.3s ease-out;
+      }
+
+      /* Responsive navigation for mobile */
+      @media (max-width: 640px) {
+        .nav-tab {
+          font-size: 0.875rem;
+          padding: 12px 16px;
+        }
       }
     </style>
   </body>
