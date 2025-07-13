@@ -258,56 +258,7 @@ public:
     // Method to verify password
     bool verifyPassword(const string &pass) const
     {
-// Enhanced debug output for Windows troubleshooting
-#ifdef _WIN32
-        cout << "=== PASSWORD VERIFICATION DEBUG ===" << endl;
-        cout << "Stored password: '" << password << "'" << endl;
-        cout << "Input password: '" << pass << "'" << endl;
-        cout << "Stored length: " << password.length() << endl;
-        cout << "Input length: " << pass.length() << endl;
-
-        cout << "Stored password (hex): ";
-        for (char c : password)
-        {
-            cout << hex << (int)(unsigned char)c << " ";
-        }
-        cout << endl;
-
-        cout << "Input password (hex): ";
-        for (char c : pass)
-        {
-            cout << hex << (int)(unsigned char)c << " ";
-        }
-        cout << dec << endl;
-
-        // Try trimmed comparison as fallback
-        string trimmedStored = password;
-        string trimmedInput = pass;
-
-        // Remove all whitespace and control characters
-        trimmedStored.erase(remove_if(trimmedStored.begin(), trimmedStored.end(),
-                                      [](char c)
-                                      { return c == '\r' || c == '\n' || c == '\t' || c == ' '; }),
-                            trimmedStored.end());
-        trimmedInput.erase(remove_if(trimmedInput.begin(), trimmedInput.end(),
-                                     [](char c)
-                                     { return c == '\r' || c == '\n' || c == '\t' || c == ' '; }),
-                           trimmedInput.end());
-
-        cout << "After cleanup - Stored: '" << trimmedStored << "' (" << trimmedStored.length() << ")" << endl;
-        cout << "After cleanup - Input: '" << trimmedInput << "' (" << trimmedInput.length() << ")" << endl;
-
-        bool exactMatch = (password == pass);
-        bool trimmedMatch = (trimmedStored == trimmedInput);
-
-        cout << "Exact match: " << (exactMatch ? "YES" : "NO") << endl;
-        cout << "Trimmed match: " << (trimmedMatch ? "YES" : "NO") << endl;
-        cout << "=================================" << endl;
-
-        return exactMatch || trimmedMatch;
-#else
         return password == pass;
-#endif
     }
 
     // Methods for banking operations
@@ -968,7 +919,6 @@ string read_file(const string &filename)
     ifstream file(file_path);
     if (!file.is_open())
     {
-        cerr << "Error: Could not open " << file_path << endl;
         return "Error: Could not load " + filename + ". Make sure public folder exists in the same directory as the executable.";
     }
     return string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
