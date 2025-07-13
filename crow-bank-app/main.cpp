@@ -253,7 +253,56 @@ public:
     // Method to verify password
     bool verifyPassword(const string &pass) const
     {
+// Enhanced debug output for Windows troubleshooting
+#ifdef _WIN32
+        cout << "=== PASSWORD VERIFICATION DEBUG ===" << endl;
+        cout << "Stored password: '" << password << "'" << endl;
+        cout << "Input password: '" << pass << "'" << endl;
+        cout << "Stored length: " << password.length() << endl;
+        cout << "Input length: " << pass.length() << endl;
+
+        cout << "Stored password (hex): ";
+        for (char c : password)
+        {
+            cout << hex << (int)(unsigned char)c << " ";
+        }
+        cout << endl;
+
+        cout << "Input password (hex): ";
+        for (char c : pass)
+        {
+            cout << hex << (int)(unsigned char)c << " ";
+        }
+        cout << dec << endl;
+
+        // Try trimmed comparison as fallback
+        string trimmedStored = password;
+        string trimmedInput = pass;
+
+        // Remove all whitespace and control characters
+        trimmedStored.erase(remove_if(trimmedStored.begin(), trimmedStored.end(),
+                                      [](char c)
+                                      { return c == '\r' || c == '\n' || c == '\t' || c == ' '; }),
+                            trimmedStored.end());
+        trimmedInput.erase(remove_if(trimmedInput.begin(), trimmedInput.end(),
+                                     [](char c)
+                                     { return c == '\r' || c == '\n' || c == '\t' || c == ' '; }),
+                           trimmedInput.end());
+
+        cout << "After cleanup - Stored: '" << trimmedStored << "' (" << trimmedStored.length() << ")" << endl;
+        cout << "After cleanup - Input: '" << trimmedInput << "' (" << trimmedInput.length() << ")" << endl;
+
+        bool exactMatch = (password == pass);
+        bool trimmedMatch = (trimmedStored == trimmedInput);
+
+        cout << "Exact match: " << (exactMatch ? "YES" : "NO") << endl;
+        cout << "Trimmed match: " << (trimmedMatch ? "YES" : "NO") << endl;
+        cout << "=================================" << endl;
+
+        return exactMatch || trimmedMatch;
+#else
         return password == pass;
+#endif
     }
 
     // Methods for banking operations
@@ -468,6 +517,16 @@ string getUserDataPath()
     return get_file_path("users.dat");
 }
 
+// Utility function to trim whitespace and carriage returns (Windows compatibility)
+string trim(const string &str)
+{
+    size_t start = str.find_first_not_of(" \t\r\n");
+    if (start == string::npos)
+        return "";
+    size_t end = str.find_last_not_of(" \t\r\n");
+    return str.substr(start, end - start + 1);
+}
+
 // Simple encryption for password storage (basic XOR - not production-ready)
 string encryptPassword(const string &password)
 {
@@ -477,12 +536,56 @@ string encryptPassword(const string &password)
     {
         encrypted[i] ^= key[i % key.length()];
     }
+
+#ifdef _WIN32
+    // Convert to hex string for Windows compatibility
+    stringstream hex_stream;
+    for (unsigned char c : encrypted)
+    {
+        hex_stream << hex << setfill('0') << setw(2) << (int)c;
+    }
+    return hex_stream.str();
+#else
     return encrypted;
+#endif
 }
 
 string decryptPassword(const string &encrypted)
 {
-    return encryptPassword(encrypted); // XOR is symmetric
+#ifdef _WIN32
+    // Convert from hex string on Windows
+    if (encrypted.length() % 2 != 0)
+    {
+        // If not hex format, fall back to direct XOR (for backward compatibility)
+        return encryptPassword(encrypted);
+    }
+
+    string binary_encrypted;
+    for (size_t i = 0; i < encrypted.length(); i += 2)
+    {
+        string hex_byte = encrypted.substr(i, 2);
+        try
+        {
+            unsigned char byte = static_cast<unsigned char>(stoi(hex_byte, nullptr, 16));
+            binary_encrypted += byte;
+        }
+        catch (...)
+        {
+            // If hex conversion fails, fall back to direct XOR
+            return encryptPassword(encrypted);
+        }
+    }
+
+    // Now decrypt the binary data
+    const string key = "SecureBankKey2025";
+    for (size_t i = 0; i < binary_encrypted.length(); ++i)
+    {
+        binary_encrypted[i] ^= key[i % key.length()];
+    }
+    return binary_encrypted;
+#else
+    return encryptPassword(encrypted); // XOR is symmetric on Linux
+#endif
 }
 
 // Secure password input function with masking
@@ -554,7 +657,7 @@ bool saveUsersToFile(const map<string, User> &users)
 {
     try
     {
-        ofstream file(getUserDataPath());
+        ofstream file(getUserDataPath(), ios::out);
         if (!file.is_open())
         {
             return false;
@@ -581,7 +684,7 @@ bool saveUsersToFile(const map<string, User> &users)
                 {
                     file << trans << ";";
                 }
-                file << endl;
+                file << "\n"; // Use explicit \n instead of endl
             }
         }
         file.close();
@@ -621,8 +724,17 @@ bool loadUsersFromFile(map<string, User> &users, int &totalUsers)
                 getline(ss, accountType, '|') &&
                 getline(ss, balanceStr, '|'))
             {
+                // Trim all fields to remove carriage returns (Windows compatibility)
+                email = trim(email);
+                name = trim(name);
+                phone = trim(phone);
+                encryptedPass = trim(encryptedPass);
+                accountNum = trim(accountNum);
+                accountType = trim(accountType);
+                balanceStr = trim(balanceStr);
 
                 string password = decryptPassword(encryptedPass);
+                password = trim(password); // Trim decrypted password to remove any carriage returns
                 double balance = stod(balanceStr);
 
                 User user(name, email, phone, password);
@@ -635,6 +747,9 @@ bool loadUsersFromFile(map<string, User> &users, int &totalUsers)
                     // Load transaction history if available (for backward compatibility)
                     if (getline(ss, transCountStr, '|') && getline(ss, transactionsStr))
                     {
+                        transCountStr = trim(transCountStr);
+                        transactionsStr = trim(transactionsStr);
+
                         int transCount = stoi(transCountStr);
                         if (transCount > 0)
                         {
@@ -643,7 +758,7 @@ bool loadUsersFromFile(map<string, User> &users, int &totalUsers)
                             string transaction;
                             while (getline(transSS, transaction, ';') && !transaction.empty())
                             {
-                                history.push_back(transaction);
+                                history.push_back(trim(transaction));
                             }
                             user.getAccount()->setTransactionHistory(history);
                         }
@@ -694,11 +809,17 @@ public:
     // Method to authenticate user
     string authenticateUser(const string &email, const string &password)
     {
-        auto it = users.find(email);
-        if (it != users.end() && it->second.verifyPassword(password))
+        reloadData(); // Reload fresh data from file
+
+        // Trim input parameters to handle any extra whitespace
+        string trimmedEmail = trim(email);
+        string trimmedPassword = trim(password);
+
+        auto it = users.find(trimmedEmail);
+        if (it != users.end() && it->second.verifyPassword(trimmedPassword))
         {
             string token = generateToken();
-            sessions[token] = email;
+            sessions[token] = trimmedEmail;
             return token;
         }
         return "";
@@ -707,6 +828,7 @@ public:
     // Method to get user by token
     User *getUserByToken(const string &token)
     {
+        reloadData(); // Reload fresh data from file
         auto sessionIt = sessions.find(token);
         if (sessionIt != sessions.end())
         {
@@ -738,6 +860,14 @@ public:
         return saveUsersToFile(users);
     }
 
+    // Method to reload data from file (for sync between CLI and web)
+    bool reloadData()
+    {
+        users.clear(); // Clear current in-memory data
+        totalUsers = 0;
+        return loadUsersFromFile(users, totalUsers);
+    }
+
     // Static method to get total users
     static int getTotalUsers()
     {
@@ -748,6 +878,7 @@ public:
     template <typename T>
     User *findUser(const string &key, T value)
     {
+        reloadData(); // Reload fresh data from file
         for (auto &pair : users)
         {
             if (key == "email" && pair.second.getEmail() == value)
@@ -929,9 +1060,18 @@ User *loginUser(BankSystem &bank)
 void handleBankingOperations(BankSystem &bank, User *currentUser)
 {
     int choice;
+    string userEmail = currentUser->getEmail(); // Store email for reloading
 
     while (true)
     {
+        // Refresh user data from file before each operation
+        currentUser = bank.findUser("email", userEmail);
+        if (!currentUser)
+        {
+            cout << getIcon("error") << " User session expired. Please login again.\n";
+            return;
+        }
+
         clearScreen(); // Clear screen for clean banking interface
         displayBankingMenu(currentUser->getName());
 
@@ -1539,6 +1679,7 @@ web_mode:
         if (user && body) {
             double amount = body["amount"].d();
             if (user->makeDeposit(amount)) {
+                bank.saveData(); // Save after successful deposit
                 crow::json::wvalue response;
                 response["success"] = true;
                 response["message"] = "Deposit successful";
@@ -1565,6 +1706,7 @@ web_mode:
         if (user && body) {
             double amount = body["amount"].d();
             if (user->makeWithdrawal(amount)) {
+                bank.saveData(); // Save after successful withdrawal
                 crow::json::wvalue response;
                 response["success"] = true;
                 response["message"] = "Withdrawal successful";
@@ -1576,6 +1718,151 @@ web_mode:
         }
         
         return crow::response(400, "{\"error\": \"Withdrawal failed\"}"); });
+
+    // API route for user registration
+    CROW_ROUTE(app, "/api/register").methods("POST"_method)([&bank](const crow::request &req)
+                                                            {
+        auto body = crow::json::load(req.body);
+        if (!body) {
+            return crow::response(400, "{\"success\": false, \"message\": \"Invalid JSON\"}");
+        }
+
+        try {
+            string name = body["name"].s();
+            string email = body["email"].s();
+            string phone = body["phone"].s();
+            string password = body["password"].s();
+
+            // Basic validation
+            if (name.empty() || email.empty() || phone.empty() || password.empty()) {
+                return crow::response(400, "{\"success\": false, \"message\": \"All fields are required\"}");
+            }
+
+            if (password.length() < 6) {
+                return crow::response(400, "{\"success\": false, \"message\": \"Password must be at least 6 characters\"}");
+            }
+
+            if (email.find('@') == string::npos || email.find('.') == string::npos) {
+                return crow::response(400, "{\"success\": false, \"message\": \"Invalid email format\"}");
+            }
+
+            // Create new user
+            User newUser(name, email, phone, password);
+            
+            if (bank.addUser(newUser)) {
+                crow::json::wvalue response;
+                response["success"] = true;
+                response["message"] = "Account created successfully";
+                response["accountNumber"] = newUser.getAccount()->getAccountNumber();
+                return crow::response(201, response.dump());
+            } else {
+                return crow::response(409, "{\"success\": false, \"message\": \"Email already exists\"}");
+            }
+        } catch (...) {
+            return crow::response(400, "{\"success\": false, \"message\": \"Invalid request data\"}");
+        } });
+
+    // API route for transaction history
+    CROW_ROUTE(app, "/api/transactions")
+    ([&bank](const crow::request &req)
+     {
+        string auth_header = req.get_header_value("Authorization");
+        if (auth_header.substr(0, 7) != "Bearer ") {
+            return crow::response(401, "{\"error\": \"Unauthorized\"}");
+        }
+        
+        string token = auth_header.substr(7);
+        User* user = bank.getUserByToken(token);
+        
+        if (user && user->getAccount()) {
+            crow::json::wvalue response;
+            
+            // Get account transaction history
+            auto accountHistory = user->getAccount()->getTransactionHistory();
+            response["accountTransactions"] = crow::json::wvalue::list();
+            for (size_t i = 0; i < accountHistory.size(); i++) {
+                response["accountTransactions"][i] = accountHistory[i];
+            }
+            
+            // Get detailed transaction log
+            auto transactions = user->getTransactions();
+            response["detailedTransactions"] = crow::json::wvalue::list();
+            for (size_t i = 0; i < transactions.size(); i++) {
+                crow::json::wvalue trans;
+                trans["id"] = transactions[i].getId();
+                trans["type"] = transactions[i].getType();
+                trans["amount"] = transactions[i].getAmount();
+                trans["timestamp"] = transactions[i].getTimestamp();
+                response["detailedTransactions"][i] = move(trans);
+            }
+            
+            return crow::response(200, response.dump());
+        } else {
+            return crow::response(404, "{\"error\": \"User not found\"}");
+        } });
+
+    // API route for money transfer
+    CROW_ROUTE(app, "/api/transfer").methods("POST"_method)([&bank](const crow::request &req)
+                                                            {
+        auto body = crow::json::load(req.body);
+        string auth_header = req.get_header_value("Authorization");
+        
+        if (auth_header.substr(0, 7) != "Bearer ") {
+            return crow::response(401, "{\"error\": \"Unauthorized\"}");
+        }
+        
+        string token = auth_header.substr(7);
+        User* fromUser = bank.getUserByToken(token);
+        
+        if (fromUser && body) {
+            try {
+                string toEmail = body["toEmail"].s();
+                double amount = body["amount"].d();
+
+                if (amount <= 0) {
+                    return crow::response(400, "{\"error\": \"Invalid amount\"}");
+                }
+
+                User* toUser = bank.findUser("email", toEmail);
+                if (!toUser) {
+                    return crow::response(404, "{\"error\": \"Recipient account not found\"}");
+                }
+
+                if (toUser->getEmail() == fromUser->getEmail()) {
+                    return crow::response(400, "{\"error\": \"Cannot transfer to yourself\"}");
+                }
+
+                // Perform transfer
+                if (fromUser->makeWithdrawal(amount)) {
+                    if (toUser->makeDeposit(amount)) {
+                        bank.saveData(); // Save after successful transfer
+                        
+                        crow::json::wvalue response;
+                        response["success"] = true;
+                        response["message"] = "Transfer successful";
+                        response["newBalance"] = fromUser->getAccount()->getBalance();
+                        response["recipient"] = toUser->getName();
+                        response["amount"] = amount;
+                        return crow::response(200, response.dump());
+                    } else {
+                        // Rollback withdrawal if deposit fails
+                        fromUser->makeDeposit(amount);
+                        return crow::response(500, "{\"error\": \"Transfer failed - deposit error\"}");
+                    }
+                } else {
+                    return crow::response(400, "{\"error\": \"Insufficient funds\"}");
+                }
+            } catch (...) {
+                return crow::response(400, "{\"error\": \"Invalid request data\"}");
+            }
+        }
+        
+        return crow::response(400, "{\"error\": \"Transfer failed\"}"); });
+
+    // Route for JavaScript files
+    CROW_ROUTE(app, "/js/<path>")
+    ([](const crow::request &req, const string &path)
+     { return crow::response(200, read_file("js/" + path)); });
 
     // Route for CSS file
     CROW_ROUTE(app, "/style.css")

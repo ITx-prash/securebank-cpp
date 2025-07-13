@@ -16,10 +16,10 @@
           </div>
           <div class="flex items-center space-x-4">
             <span id="userName" class="text-gray-700 font-medium"
-              >Welcome, John</span
+              >Welcome, User</span
             >
             <button
-              onclick="logout()"
+              id="logoutBtn"
               class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
             >
               Logout
@@ -52,17 +52,14 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-500">Current Balance</p>
-              <p
-                id="accountBalance"
-                class="text-2xl font-semibold text-gray-900"
-              >
-                $5,847.32
+              <p id="balance" class="text-2xl font-semibold text-gray-900">
+                $0.00
               </p>
             </div>
           </div>
         </div>
 
-        <!-- Savings Card -->
+        <!-- Account Info Card -->
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
             <div class="p-2 bg-blue-100 rounded-md">
@@ -81,18 +78,20 @@
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Savings Account</p>
-              <p class="text-2xl font-semibold text-gray-900">$12,450.89</p>
+              <p class="text-sm font-medium text-gray-500">Account Number</p>
+              <p id="accountNumber" class="text-lg font-semibold text-gray-900">
+                Loading...
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- Credit Card -->
+        <!-- Quick Balance Refresh -->
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex items-center">
-            <div class="p-2 bg-red-100 rounded-md">
+            <div class="p-2 bg-purple-100 rounded-md">
               <svg
-                class="w-6 h-6 text-red-600"
+                class="w-6 h-6 text-purple-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -101,215 +100,337 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 ></path>
               </svg>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500">Credit Available</p>
-              <p class="text-2xl font-semibold text-gray-900">$2,150.00</p>
+              <!-- <p class="text-sm font-medium text-gray-500">Last Updated</p> -->
+              <button
+                id="refreshBtn"
+                class="text-purple-600 hover:text-purple-700 font-medium cursor-pointer"
+              >
+                Refresh Now
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Quick Actions -->
-        <div class="lg:col-span-1">
-          <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">
-              Quick Actions
-            </h2>
-            <div class="space-y-3">
-              <button
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-left"
-              >
-                💸 Transfer Money
-              </button>
-              <button
-                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-left"
-              >
-                💰 Deposit Funds
-              </button>
-              <button
-                class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-md text-left"
-              >
-                🏧 Withdraw Cash
-              </button>
-              <button
-                class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-left"
-              >
-                📊 View Statements
-              </button>
+      <!-- Navigation Menu -->
+      <div class="bg-white rounded-lg shadow mb-8">
+        <nav class="flex space-x-8 px-6 py-4">
+          <button
+            data-section="balance"
+            class="nav-btn active px-3 py-2 text-sm font-medium hover:text-gray-700"
+          >
+            Balance Overview
+          </button>
+          <button
+            data-section="deposit"
+            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+          >
+            Deposit
+          </button>
+          <button
+            data-section="withdraw"
+            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+          >
+            Withdraw
+          </button>
+          <button
+            data-section="transfer"
+            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+          >
+            Transfer
+          </button>
+          <button
+            data-section="history"
+            class="nav-btn px-3 py-2 text-sm font-medium hover:text-gray-700"
+          >
+            History
+          </button>
+        </nav>
+      </div>
+
+      <!-- Dashboard Sections -->
+
+      <!-- Balance Section -->
+      <div id="balanceSection" class="dashboard-section active">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Account Overview
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">
+                Account Details
+              </h3>
+              <div class="space-y-2">
+                <p>
+                  <span class="font-medium">Account Holder:</span>
+                  <span id="accountHolder">Loading...</span>
+                </p>
+                <p>
+                  <span class="font-medium">Account Number:</span>
+                  <span id="accountNumberDetail">Loading...</span>
+                </p>
+                <p>
+                  <span class="font-medium">Account Type:</span>
+                  <span>Savings</span>
+                </p>
+                <p>
+                  <span class="font-medium">Current Balance:</span>
+                  <span id="balanceDetail" class="text-green-600 font-semibold"
+                    >$0.00</span
+                  >
+                </p>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-2">
+                Quick Actions
+              </h3>
+              <div class="space-y-2">
+                <button
+                  data-section="deposit"
+                  class="nav-btn w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-left"
+                >
+                  💰 Make Deposit
+                </button>
+                <button
+                  data-section="withdraw"
+                  class="nav-btn w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-left"
+                >
+                  💸 Withdraw Money
+                </button>
+                <button
+                  data-section="transfer"
+                  class="nav-btn w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-left"
+                >
+                  🔄 Transfer Funds
+                </button>
+                <button
+                  data-section="history"
+                  class="nav-btn w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-left"
+                >
+                  📊 View History
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Recent Transactions -->
-        <div class="lg:col-span-2">
-          <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">
-              Recent Transactions
-            </h2>
-            <div class="space-y-4">
-              <div
-                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+      <!-- Deposit Section -->
+      <div id="depositSection" class="dashboard-section">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Deposit Money</h2>
+          <form id="depositForm" class="space-y-4">
+            <div>
+              <label
+                for="depositAmount"
+                class="block text-sm font-medium text-gray-700"
+                >Amount to Deposit</label
               >
-                <div class="flex items-center">
-                  <div class="p-2 bg-green-100 rounded-md mr-3">
-                    <svg
-                      class="w-4 h-4 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-gray-900">Salary Deposit</p>
-                    <p class="text-sm text-gray-500">Dec 1, 2024</p>
-                  </div>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <span class="text-gray-500 sm:text-sm">$</span>
                 </div>
-                <span class="text-green-600 font-medium">+$3,200.00</span>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-              >
-                <div class="flex items-center">
-                  <div class="p-2 bg-red-100 rounded-md mr-3">
-                    <svg
-                      class="w-4 h-4 text-red-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-gray-900">Grocery Store</p>
-                    <p class="text-sm text-gray-500">Nov 30, 2024</p>
-                  </div>
-                </div>
-                <span class="text-red-600 font-medium">-$127.45</span>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-              >
-                <div class="flex items-center">
-                  <div class="p-2 bg-blue-100 rounded-md mr-3">
-                    <svg
-                      class="w-4 h-4 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-gray-900">Transfer to Savings</p>
-                    <p class="text-sm text-gray-500">Nov 29, 2024</p>
-                  </div>
-                </div>
-                <span class="text-blue-600 font-medium">-$500.00</span>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-              >
-                <div class="flex items-center">
-                  <div class="p-2 bg-green-100 rounded-md mr-3">
-                    <svg
-                      class="w-4 h-4 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-gray-900">Freelance Payment</p>
-                    <p class="text-sm text-gray-500">Nov 28, 2024</p>
-                  </div>
-                </div>
-                <span class="text-green-600 font-medium">+$850.00</span>
+                <input
+                  type="number"
+                  id="depositAmount"
+                  name="amount"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="0.00"
+                />
               </div>
             </div>
+            <button
+              type="submit"
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md font-medium"
+            >
+              Deposit Funds
+            </button>
+          </form>
+        </div>
+      </div>
 
-            <div class="mt-4 text-center">
-              <button
-                class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
+      <!-- Withdraw Section -->
+      <div id="withdrawSection" class="dashboard-section">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Withdraw Money</h2>
+          <form id="withdrawForm" class="space-y-4">
+            <div>
+              <label
+                for="withdrawAmount"
+                class="block text-sm font-medium text-gray-700"
+                >Amount to Withdraw</label
               >
-                View All Transactions
-              </button>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <span class="text-gray-500 sm:text-sm">$</span>
+                </div>
+                <input
+                  type="number"
+                  id="withdrawAmount"
+                  name="amount"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="0.00"
+                />
+              </div>
             </div>
+            <button
+              type="submit"
+              class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-medium"
+            >
+              Withdraw Funds
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Transfer Section -->
+      <div id="transferSection" class="dashboard-section">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Transfer Money</h2>
+          <form id="transferForm" class="space-y-4">
+            <div>
+              <label
+                for="transferEmail"
+                class="block text-sm font-medium text-gray-700"
+                >Recipient Email</label
+              >
+              <input
+                type="email"
+                id="transferEmail"
+                name="email"
+                required
+                class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="recipient@example.com"
+              />
+            </div>
+            <div>
+              <label
+                for="transferAmount"
+                class="block text-sm font-medium text-gray-700"
+                >Amount to Transfer</label
+              >
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <span class="text-gray-500 sm:text-sm">$</span>
+                </div>
+                <input
+                  type="number"
+                  id="transferAmount"
+                  name="amount"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  class="block w-full pl-7 pr-12 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium"
+            >
+              Transfer Funds
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- History Section -->
+      <div id="historySection" class="dashboard-section">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Transaction History
+          </h2>
+          <div id="transactionHistory">
+            <p class="text-gray-500">Loading transaction history...</p>
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-      // Check if user is authenticated
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        window.location.href = "/login";
+    <!-- JavaScript Modules -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+
+    <style>
+      .dashboard-section {
+        display: none;
       }
 
-      function logout() {
-        localStorage.removeItem("authToken");
-        window.location.href = "/login";
+      .dashboard-section.active {
+        display: block;
       }
 
-      // Load user data
-      async function loadUserData() {
-        try {
-          const response = await fetch("/api/user-data", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            document.getElementById(
-              "userName"
-            ).textContent = `Welcome, ${userData.name}`;
-            document.getElementById(
-              "accountBalance"
-            ).textContent = `$${userData.balance.toLocaleString()}`;
-          }
-        } catch (error) {
-          console.error("Failed to load user data:", error);
-        }
+      .nav-btn {
+        color: #6b7280;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
       }
 
-      // Load user data when page loads
-      loadUserData();
-    </script>
+      .nav-btn.active {
+        color: #4f46e5 !important;
+        border-bottom: 2px solid #4f46e5 !important;
+      }
+
+      .nav-btn:hover:not(.active) {
+        color: #374151;
+      }
+
+      .transaction-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .transaction-detail {
+        padding: 12px;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        font-family: monospace;
+        font-size: 0.875rem;
+      }
+
+      .transaction-group {
+        margin-bottom: 24px;
+      }
+
+      .transaction-group h4 {
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #374151;
+      }
+
+      .form-field.error input {
+        border-color: #dc3545;
+      }
+
+      .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+      }
+    </style>
   </body>
 </html>

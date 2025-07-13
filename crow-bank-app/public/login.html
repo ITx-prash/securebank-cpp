@@ -30,8 +30,8 @@
               id="loginEmail"
               name="email"
               required
-              value="john@demo.com"
               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter your email address"
             />
           </div>
 
@@ -46,8 +46,8 @@
               id="loginPassword"
               name="password"
               required
-              value="password123"
               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter your password"
             />
           </div>
 
@@ -84,13 +84,6 @@
           <p class="text-sm"></p>
         </div>
 
-        <!-- Demo Credentials -->
-        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <h3 class="text-sm font-medium text-blue-800">Demo Credentials:</h3>
-          <p class="text-sm text-blue-600 mt-1">Email: john@bank.com</p>
-          <p class="text-sm text-blue-600">Password: password123</p>
-        </div>
-
         <p class="mt-6 text-center text-sm text-gray-500">
           Don't have an account?
           <a href="/" class="text-indigo-600 hover:text-indigo-500 font-medium"
@@ -100,49 +93,59 @@
       </div>
     </div>
 
+    <!-- JavaScript Modules -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
     <script>
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async function (e) {
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginForm = document.getElementById("loginForm");
+
+        loginForm.addEventListener("submit", async function (e) {
           e.preventDefault();
 
-          const email = document.getElementById("loginEmail").value;
+          const email = document.getElementById("loginEmail").value.trim();
           const password = document.getElementById("loginPassword").value;
 
+          // Basic validation
+          if (!email || !password) {
+            showError("Please fill in all fields");
+            return;
+          }
+
+          if (!window.utils.validateEmail(email)) {
+            showError("Please enter a valid email address");
+            return;
+          }
+
+          // Disable submit button during login
+          const submitBtn = loginForm.querySelector('button[type="submit"]');
+          const originalText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing In...";
+
           try {
-            const response = await fetch("/api/login", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email, password }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-              // Store token and redirect to dashboard
-              localStorage.setItem("authToken", data.token);
-              window.location.href = "/dashboard";
-            } else {
-              // Show error message
-              showError(data.message || "Login failed");
-            }
+            await window.auth.login(email, password);
           } catch (error) {
-            showError("Connection error. Please try again.");
+            showError(error.message || "Login failed");
+          } finally {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
           }
         });
 
-      function showError(message) {
-        const errorDiv = document.getElementById("errorMessage");
-        errorDiv.querySelector("p").textContent = message;
-        errorDiv.classList.remove("hidden");
+        function showError(message) {
+          const errorDiv = document.getElementById("errorMessage");
+          errorDiv.querySelector("p").textContent = message;
+          errorDiv.classList.remove("hidden");
 
-        // Hide error after 5 seconds
-        setTimeout(() => {
-          errorDiv.classList.add("hidden");
-        }, 5000);
-      }
+          // Hide error after 5 seconds
+          setTimeout(() => {
+            errorDiv.classList.add("hidden");
+          }, 5000);
+        }
+      });
     </script>
   </body>
 </html>
