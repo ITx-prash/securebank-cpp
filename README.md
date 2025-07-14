@@ -1,50 +1,25 @@
-# 🏦 SecureBank-CPP - Modern C++ Banking System
+# 🏦 SecureBank-CPP
 
-A comprehensive banking application built with modern C++ demonstrating advanced Object-Oriented Programming concepts. Features both CLI and Web interfaces with cross-platform compatibility.
+Modern C++ banking application with CLI and web interfaces. Demonstrates OOP concepts, REST API design, and cross-platform development.
 
-## 🚀 Current Status
+## Features
 
-**✅ CLI Interface - Complete**
+- **CLI Interface**: Complete banking operations with cross-platform support
+- **Web Interface**: REST API with Crow framework + modern frontend
+- **Cross-Platform**: Windows/Linux builds via CMake
+- **Real-time Updates**: Live transaction stats and history
+- **Security**: Session management, input validation, encrypted storage
 
-- Full banking operations (register, login, deposit, withdraw, transfer)
-- Cross-platform compatibility (Windows/Linux)
-- Smart emoji/ASCII UI adaptation
-- Persistent encrypted data storage
+## Tech Stack
 
-**🔄 Web Interface - In Development**
+- **Backend**: C++17, Crow micro web framework
+- **Frontend**: HTML5/CSS3/Vanilla JS
+- **Build**: CMake
+- **Storage**: File-based with XOR encryption
 
-- REST API with Crow framework
-- Modern web dashboard
-- Shared backend with CLI
+## Quick Start
 
-## 🎯 Key Features
-
-### CLI Application
-
-- 🔐 **Secure Authentication** - User registration and login system
-- 💰 **Banking Operations** - Deposit, withdraw, balance check, money transfer
-- 📊 **Transaction History** - Complete transaction tracking
-- 🌍 **Cross-Platform** - Works on Windows and Linux
-- 🎨 **Smart UI** - Automatic emoji/ASCII detection based on terminal
-- 🔒 **Data Security** - XOR encryption for password storage
-- ⚡ **Modern C++** - Showcases OOP principles and best practices
-
-### Technical Highlights
-
-- **Inheritance & Polymorphism** - Person → User class hierarchy
-- **Encapsulation** - Private data with controlled access
-- **RAII & Smart Memory** - Proper resource management
-- **STL Containers** - Vector, Map for efficient data handling
-- **Error Handling** - Comprehensive input validation
-
-## 🛠️ Tech Stack
-
-- **Language:** C++17
-- **Web Framework:** Crow (micro web framework)
-- **Build System:** CMake
-- **Cross-Platform:** Windows & Linux support
-
-## 🚀 Quick Start
+### Simple Build
 
 ```bash
 cd crow-bank-app/
@@ -52,16 +27,61 @@ cd crow-bank-app/
 ./build.sh windows  # For Windows cross-compilation
 ```
 
-## 📝 Note
+### Manual Build (CMake)
 
-**Full documentation, screenshots, and web interface coming soon!**
+```bash
+cd crow-bank-app/
+mkdir build && cd build
+cmake ..
+make
+./crow_bank_app
+```
 
-This README will be expanded with comprehensive setup instructions and feature demonstrations once the web interface is completed.
+### Build Options
+
+```bash
+./build.sh --help    # See all build options
+```
+
+## Development
+
+### Project Structure
+
+```
+crow-bank-app/
+├── main.cpp              # Entry point + Crow server setup
+├── crow_all.h            # Crow framework header
+├── public/               # Web interface files
+│   ├── index.html        # Login page
+│   ├── register.html     # Registration
+│   ├── dashboard.html    # Main banking interface
+│   ├── style.css         # Styles
+│   └── js/               # JavaScript modules
+└── build.sh              # Build script
+```
+
+### Testing Environment
+
+- Tested on Linux (native & KVM VMs)
+- Windows cross-compilation support
+- Lightweight - works well in resource-constrained environments
+
+### Web Interface
+
+Start server and visit `http://localhost:8080`
+
+### API Endpoints
+
+- `POST /api/register` - User registration
+- `POST /api/login` - Authentication
+- `GET /api/user` - User data
+- `POST /api/deposit` - Deposit funds
+- `POST /api/withdraw` - Withdraw funds
+- `POST /api/transfer` - Transfer money
+- `GET /api/transactions` - Transaction history
 
 ---
+
+**Educational project showcasing practical C++ development and modern web integration.**
 
 **Made with ❤️ by ITx-prash**
-
-_Educational project showcasing practical C++ OOP concepts in banking applications._
-
----
