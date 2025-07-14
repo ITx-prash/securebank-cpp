@@ -1413,18 +1413,6 @@
     }
   }
 }
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-10px) rotate(1deg);
-  }
-  66% {
-    transform: translateY(5px) rotate(-1deg);
-  }
-}
 @keyframes fadeInOut {
   0%,
   100% {
@@ -1443,30 +1431,18 @@
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
   }
 }
-.bg-dots {
+/* Static background pattern - no animations for better performance */
+.bg-static-dots {
   background-image: radial-gradient(
-    circle,
-    rgba(59, 130, 246, 0.1) 1px,
-    transparent 1px
-  );
-  background-size: 50px 50px;
-  animation: float 20s ease-in-out infinite;
+      circle,
+      rgba(59, 130, 246, 0.12) 1px,
+      transparent 1px
+    ),
+    radial-gradient(circle, rgba(147, 197, 253, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px, 40px 40px;
+  background-position: 0 0, 30px 30px;
 }
-.bg-dots::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: radial-gradient(
-    circle,
-    rgba(147, 197, 253, 0.05) 1px,
-    transparent 1px
-  );
-  background-size: 30px 30px;
-  animation: float 15s ease-in-out infinite reverse;
-}
+
 .glass {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(10px);
