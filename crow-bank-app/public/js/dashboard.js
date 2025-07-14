@@ -124,24 +124,25 @@ class Dashboard {
 
       // Update Quick Stats display
       const totalDepositsElement = document.querySelector(
-        ".text-emerald-400.font-medium"
+        ".text-emerald-400.font-semibold"
       );
       if (totalDepositsElement) {
         totalDepositsElement.textContent = `$${totalDeposits.toFixed(2)}`;
       }
 
       const totalWithdrawalsElement = document.querySelector(
-        ".text-red-400.font-medium"
+        ".text-red-400.font-semibold"
       );
       if (totalWithdrawalsElement) {
         totalWithdrawalsElement.textContent = `$${totalWithdrawals.toFixed(2)}`;
       }
 
-      const transactionCountElement = document.querySelector(
-        ".text-blue-400.font-medium"
+      const netBalanceElement = document.querySelector(
+        ".text-blue-400.font-semibold"
       );
-      if (transactionCountElement) {
-        transactionCountElement.textContent = transactionCount.toString();
+      if (netBalanceElement) {
+        const netBalance = totalDeposits - totalWithdrawals;
+        netBalanceElement.textContent = `$${netBalance.toFixed(2)}`;
       }
     } catch (error) {
       console.error("Failed to update quick stats:", error);
@@ -152,8 +153,13 @@ class Dashboard {
     // Navigation buttons
     document.querySelectorAll(".nav-tab").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const section = e.target.dataset.section;
-        this.showSection(section);
+        e.preventDefault();
+        e.stopPropagation();
+        // Use currentTarget to get the button element, not the clicked child element
+        const section = e.currentTarget.dataset.section;
+        if (section) {
+          this.showSection(section);
+        }
       });
     });
 

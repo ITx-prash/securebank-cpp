@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureBank - Register Account</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-slate-900 min-h-screen text-slate-100 relative overflow-x-hidden overflow-y-auto"
+    style="background-color: #0b1222; font-size: 100%; zoom: 1"
+  >
+    <!-- Animated Background -->
+    <div class="fixed inset-0 bg-dots opacity-20 pointer-events-none"></div>
+
+    <!-- Header -->
+    <header
+      class="bg-slate-800/50 backdrop-blur-sm sticky top-0 z-40 border-b border-slate-700/30"
+    >
+      <div class="px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-start items-center py-4">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-sm">🏦</span>
+            </div>
+            <h1
+              class="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+            >
+              SecureBank
+            </h1>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main
+      class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
+    >
+      <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+        <!-- Left Column - Hero Content -->
+        <div class="mb-12 lg:mb-0 lg:pr-8">
+          <h1
+            class="text-4xl font-bold text-slate-100 sm:text-5xl md:text-6xl leading-tight"
+          >
+            Your Money,
+            <span
+              class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+              >Secured</span
+            >
+          </h1>
+          <p
+            class="mt-6 text-xl text-slate-300 sm:mt-8 sm:text-2xl leading-relaxed"
+          >
+            Experience modern banking with cutting-edge security and seamless
+            transactions.
+          </p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-4">
+            <a
+              href="/login"
+              class="btn-gradient px-8 py-3 rounded-lg text-lg font-medium text-white transition-all duration-200"
+            >
+              Log In
+            </a>
+            <a
+              href="https://github.com/ITx-prash/securebank-cpp"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-slate-700/50 hover:bg-slate-600/50 px-8 py-3 rounded-lg text-lg font-medium text-slate-300 hover:text-blue-400 transition-all duration-200"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Signup Form -->
+        <div
+          id="signup"
+          class="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-slate-700/30"
+        >
+          <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center">
+            <span
+              class="w-8 h-8 bg-gradient-to-r from-slate-700 to-slate-800 rounded-lg flex items-center justify-center mr-3 border border-slate-600"
+            >
+              <svg
+                class="w-5 h-5 text-slate-300"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                />
+              </svg>
+            </span>
+            Create Your Account
+          </h2>
+          <form id="signupForm" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="firstName"
+                  class="block text-sm font-medium text-slate-300 mb-2"
+                  >First Name</label
+                >
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  required
+                  class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label
+                  for="lastName"
+                  class="block text-sm font-medium text-slate-300 mb-2"
+                  >Last Name</label
+                >
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  required
+                  class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium text-slate-300 mb-2"
+                >Email Address</label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium text-slate-300 mb-2"
+                >Phone Number</label
+              >
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                required
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div>
+              <label
+                for="password"
+                class="block text-sm font-medium text-slate-300 mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div>
+              <label
+                for="confirmPassword"
+                class="block text-sm font-medium text-slate-300 mb-2"
+                >Confirm Password</label
+              >
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                class="input-dark block w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              />
+            </div>
+
+            <div class="flex items-center">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                required
+                class="h-4 w-4 text-blue-500 focus:ring-blue-500 bg-slate-700 border-slate-600 rounded"
+              />
+              <label for="terms" class="ml-2 block text-sm text-slate-300">
+                I agree to the
+                <a
+                  href="#"
+                  class="text-blue-400 hover:text-blue-300 transition-colors"
+                  >Terms and Conditions</a
+                >
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              class="btn-gradient w-full py-3 px-6 rounded-lg font-medium text-white transition-all duration-200 flex items-center justify-center"
+            >
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"
+                />
+              </svg>
+              Create Account
+            </button>
+          </form>
+
+          <p class="mt-6 text-center text-sm text-slate-400">
+            Already have an account?
+            <a
+              href="/login"
+              class="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+              >Log in</a
+            >
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript Modules -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+      // Registration form handler
+      document.addEventListener("DOMContentLoaded", function () {
+        const signupForm = document.getElementById("signupForm");
+
+        signupForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Get form data
+          const formData = new FormData(signupForm);
+          const firstName = formData.get("firstName").trim();
+          const lastName = formData.get("lastName").trim();
+          const email = formData.get("email").trim();
+          const phone = formData.get("phone").trim();
+          const password = formData.get("password");
+          const confirmPassword = formData.get("confirmPassword");
+          const terms = formData.get("terms");
+
+          // Validation
+          const validationRules = {
+            firstName: { required: true, minLength: 2, label: "First Name" },
+            lastName: { required: true, minLength: 2, label: "Last Name" },
+            email: {
+              required: true,
+              pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Please enter a valid email address",
+              label: "Email",
+            },
+            phone: { required: true, minLength: 10, label: "Phone Number" },
+            password: { required: true, minLength: 6, label: "Password" },
+          };
+
+          const userData = { firstName, lastName, email, phone, password };
+          const validation = window.utils.validateForm(
+            userData,
+            validationRules
+          );
+
+          // Additional validation
+          const errors = validation.errors;
+
+          if (password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match";
+          }
+
+          if (!terms) {
+            errors.terms = "You must agree to the terms and conditions";
+          }
+
+          if (Object.keys(errors).length > 0) {
+            window.utils.displayFormErrors(errors);
+            return;
+          }
+
+          // Clear any existing errors
+          window.utils.displayFormErrors({});
+
+          // Disable submit button during registration
+          const submitBtn = signupForm.querySelector('button[type="submit"]');
+          const originalText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Creating Account...";
+
+          try {
+            // Register user
+            const success = await window.auth.register({
+              name: `${firstName} ${lastName}`,
+              email,
+              phone,
+              password,
+            });
+
+            if (success) {
+              signupForm.reset();
+              window.location.href = "/login?registered=true";
+            }
+          } catch (error) {
+            console.error("Registration error:", error);
+          } finally {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
