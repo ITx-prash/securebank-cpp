@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+/* SVG CSS */
+
+svg#freepik_stories-revenue:not(.animated) .animable {
+  opacity: 0;
+}
+svg#freepik_stories-revenue.animated #freepik--background-simple--inject-4 {
+  animation: 3s Infinite linear wind;
+  animation-delay: 0s;
+}
+svg#freepik_stories-revenue.animated #freepik--Coins--inject-4 {
+  animation: 3s Infinite linear floating;
+  animation-delay: 0s;
+}
+@keyframes wind {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+@keyframes floating {
+  0% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
 /* Static background dots*/
 .bg-static-dots {
   background-image: radial-gradient(
