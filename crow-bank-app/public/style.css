@@ -1166,11 +1166,11 @@ svg#bank-illustration:not(.animated) .animable {
   opacity: 0;
 }
 svg#bank-illustration.animated #freepik--background-simple--inject-4 {
-  animation: 3s Infinite linear wind;
+  animation: 3s infinite linear wind;
   animation-delay: 0s;
 }
 svg#bank-illustration.animated #freepik--Coins--inject-4 {
-  animation: 3s Infinite linear floating;
+  animation: 3s infinite linear floating;
   animation-delay: 0s;
 }
 @keyframes wind {
