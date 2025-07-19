@@ -1,0 +1,232 @@
+name: Build and Release
+# Comment for testing
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+env:
+  APP_NAME: securebank
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Use Linux for both builds (cross-compile for Windows)
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            executable: crow_bank_app
+            archive_format: tar.gz
+          - platform: windows
+            executable: crow_bank_app.exe
+            archive_format: zip
+    defaults:
+      run:
+        working-directory: crow-bank-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/include/boost
+            /usr/lib/x86_64-linux-gnu/libboost*
+          key: ubuntu-boost-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ubuntu-boost-
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          # For Linux builds
+          sudo apt-get install -y cmake g++ make zip
+          # For Windows cross-compilation  
+          sudo apt-get install -y mingw-w64
+          # Install Boost development headers (this makes them available system-wide)
+          sudo apt-get install -y libboost-all-dev
+          # Install MinGW Boost libraries for cross-compilation
+          sudo apt-get install -y libboost-all-dev:amd64 
+          # Install Windows-specific Boost libraries
+          wget -q https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip
+          unzip -q master.zip
+          cd vcpkg-master
+          ./bootstrap-vcpkg.sh
+          ./vcpkg install boost-algorithm:x64-mingw-static boost-system:x64-mingw-static
+          cd ..
+
+          # Alternative: Install mingw boost packages
+          sudo apt-get install -y libboost-dev-mingw-w64 || echo "MinGW Boost not available, using alternative approach"
+
+          # Debug: Check if Boost headers are accessible
+          echo "Checking Boost installation:"
+          ls -la /usr/include/boost/ | head -5
+          echo "Boost algorithm headers:"
+          ls -la /usr/include/boost/algorithm/ | head -5
+
+          # Check MinGW environment
+          echo "MinGW compiler location:"
+          which x86_64-w64-mingw32-g++
+          echo "MinGW include paths:"
+          x86_64-w64-mingw32-g++ -v -E -x c++ - < /dev/null 2>&1 | grep -A 20 "search starts here"
+
+      - name: Prepare Boost headers for MinGW (Windows only)
+        if: matrix.platform == 'windows'
+        run: |
+          # Copy Boost headers to MinGW sysroot if not already present
+          BOOST_SRC=/usr/include/boost
+          MINGW_INCLUDE=/usr/x86_64-w64-mingw32/include/boost
+          if [ ! -d "$MINGW_INCLUDE" ]; then
+            sudo mkdir -p /usr/x86_64-w64-mingw32/include
+            sudo cp -r $BOOST_SRC /usr/x86_64-w64-mingw32/include/
+          fi
+
+      - name: Configure and Build
+        run: |
+          if [ "${{ matrix.platform }}" == "linux" ]; then
+            echo "🐧 Building for Linux..."
+            mkdir -p build-linux
+            cd build-linux
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            # Copy executable to expected location
+            cp crow_bank_app ../crow_bank_app
+          else
+            echo "🪟 Building for Windows (cross-compilation)..."
+            mkdir -p win-build
+            cd win-build
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=../win-toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            # Copy executable to expected location
+            cp crow_bank_app.exe ../crow_bank_app.exe
+          fi
+
+      - name: Verify build output
+        run: |
+          ls -la
+          if [ ! -f "${{ matrix.executable }}" ]; then
+            echo "Error: Expected executable ${{ matrix.executable }} not found"
+            exit 1
+          fi
+
+      - name: Prepare release package
+        run: |
+          mkdir -p out
+          cp -r public out/public
+          cp README.md out/README.txt || echo "No README.md found"
+          cp ${{ matrix.executable }} out/
+
+          # Create version info
+          echo "SecureBank C++ Banking Application" > out/README.txt
+          echo "Version: $(date +%Y.%m.%d-%H%M%S)" >> out/README.txt
+          echo "Platform: ${{ matrix.platform }}" >> out/README.txt
+          echo "Built on: $(date)" >> out/README.txt
+          echo "" >> out/README.txt
+          echo "Usage:" >> out/README.txt
+          echo "1. Run the executable: ./${{ matrix.executable }}" >> out/README.txt
+          echo "2. Open browser to http://localhost:8080" >> out/README.txt
+
+          # Create archive based on platform
+          if [ "${{ matrix.platform }}" == "windows" ]; then
+            zip -r ${{ env.APP_NAME }}-${{ matrix.platform }}.zip out/*
+          else
+            tar -czf ${{ env.APP_NAME }}-${{ matrix.platform }}.tar.gz -C out .
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.platform }}
+          path: crow-bank-app/${{ env.APP_NAME }}-${{ matrix.platform }}.*
+          retention-days: 30
+
+  create-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest version and increment
+        id: version
+        run: |
+          # Get the latest tag, or start with v1.0.0 if no tags exist
+          if git describe --tags --abbrev=0 2>/dev/null; then
+            LATEST_TAG=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          else
+            LATEST_TAG="1.0.0"
+          fi
+
+          echo "Latest tag: v$LATEST_TAG"
+
+          # Split version into major.minor.patch
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
+
+          # Increment patch version for automatic releases
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+          echo "New version: v$NEW_VERSION"
+          echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "version_number=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          find artifacts -name "*.zip" -o -name "*.tar.gz" | while read file; do
+            cp "$file" release-assets/
+          done
+          ls -la release-assets/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: SecureBank ${{ steps.version.outputs.version }}
+          body: |
+            # SecureBank C++ Banking Application ${{ steps.version.outputs.version }}
+
+            ## 📦 Downloads
+            - **🐧 Linux:** [securebank-linux.tar.gz](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-linux.tar.gz) — Extract and run `./crow_bank_app`
+            - **🪟 Windows:** [securebank-windows.zip](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-windows.zip) — Extract and run `crow_bank_app.exe`
+
+            ## 🛠️ Quick Start
+            ```sh
+            # Linux
+            tar -xzf securebank-linux.tar.gz && cd securebank-linux/
+            ./crow_bank_app
+
+            # Windows - Extract zip file then:
+            crow_bank_app.exe
+            ```
+            Open your browser to [http://localhost:8080](http://localhost:8080)
+
+            ## 🔧 System Requirements
+            - **Linux:** Ubuntu 18.04+ or equivalent, 64-bit
+            - **Windows:** Windows 10+ or Windows Server 2019+, 64-bit
+            - **Memory:** 512MB RAM minimum
+            - **Storage:** 50MB free space
+
+            ---
+            *For major releases and new features, see our [release history](https://github.com/ITx-prash/securebank-cpp/releases).*
+          files: release-assets/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
