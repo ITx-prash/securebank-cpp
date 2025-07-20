@@ -1,9 +1,6 @@
 name: Build (Test Only)
 
 on:
-  push:
-    branches:
-      - "break-and-build"
   pull_request:
     branches:
       - main
