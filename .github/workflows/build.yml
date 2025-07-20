@@ -1,0 +1,117 @@
+name: Build (Test Only)
+
+on:
+  push:
+    branches:
+      - "break-and-build"
+  pull_request:
+    branches:
+      - main
+
+env:
+  APP_NAME: securebank
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            executable: crow_bank_app
+            archive_format: tar.gz
+          - platform: windows
+            executable: crow_bank_app.exe
+            archive_format: zip
+    defaults:
+      run:
+        working-directory: crow-bank-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/include/boost
+            /usr/lib/x86_64-linux-gnu/libboost*
+          key: ubuntu-boost-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ubuntu-boost-
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make zip
+          sudo apt-get install -y mingw-w64
+          sudo apt-get install -y libboost-all-dev
+          sudo apt-get install -y libboost-all-dev:amd64
+          wget -q https://github.com/microsoft/vcpkg/archive/refs/heads/master.zip
+          unzip -q master.zip
+          cd vcpkg-master
+          ./bootstrap-vcpkg.sh
+          ./vcpkg install boost-algorithm:x64-mingw-static boost-system:x64-mingw-static
+          cd ..
+          sudo apt-get install -y libboost-dev-mingw-w64 || echo "MinGW Boost not available, using alternative approach"
+          echo "Checking Boost installation:"
+          ls -la /usr/include/boost/ | head -5
+          echo "Boost algorithm headers:"
+          ls -la /usr/include/boost/algorithm/ | head -5
+          echo "MinGW compiler location:"
+          which x86_64-w64-mingw32-g++
+          echo "MinGW include paths:"
+          x86_64-w64-mingw32-g++ -v -E -x c++ - < /dev/null 2>&1 | grep -A 20 "search starts here"
+
+      - name: Prepare Boost headers for MinGW (Windows only)
+        if: matrix.platform == 'windows'
+        run: |
+          BOOST_SRC=/usr/include/boost
+          MINGW_INCLUDE=/usr/x86_64-w64-mingw32/include/boost
+          if [ ! -d "$MINGW_INCLUDE" ]; then
+            sudo mkdir -p /usr/x86_64-w64-mingw32/include
+            sudo cp -r $BOOST_SRC /usr/x86_64-w64-mingw32/include/
+          fi
+
+      - name: Configure and Build
+        run: |
+          if [ "${{ matrix.platform }}" == "linux" ]; then
+            echo "🐧 Building for Linux..."
+            mkdir -p build-linux
+            cd build-linux
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            cp crow_bank_app ../crow_bank_app
+          else
+            echo "🪟 Building for Windows (cross-compilation)..."
+            mkdir -p win-build
+            cd win-build
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=../win-toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            cp crow_bank_app.exe ../crow_bank_app.exe
+          fi
+
+      - name: Verify build output
+        run: |
+          ls -la
+          if [ ! -f "${{ matrix.executable }}" ]; then
+            echo "Error: Expected executable ${{ matrix.executable }} not found"
+            exit 1
+          fi
+
+      - name: Prepare test artifact
+        run: |
+          PACKAGE_DIR="${{ env.APP_NAME }}-${{ matrix.platform }}"
+          mkdir -p "$PACKAGE_DIR"
+          cp -r public "$PACKAGE_DIR/public"
+          cp README.md "$PACKAGE_DIR/README.txt" || echo "No README.md found"
+          cp ${{ matrix.executable }} "$PACKAGE_DIR/"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.platform }}
+          path: crow-bank-app/${{ env.APP_NAME }}-${{ matrix.platform }}/*
+          retention-days: 7
