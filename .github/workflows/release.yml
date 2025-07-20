@@ -1,12 +1,8 @@
 name: Build and Release
-# Comment for testing
+
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-  release:
-    types: [published]
 
 env:
   APP_NAME: securebank
@@ -117,26 +113,27 @@ jobs:
 
       - name: Prepare release package
         run: |
-          mkdir -p out
-          cp -r public out/public
-          cp README.md out/README.txt || echo "No README.md found"
-          cp ${{ matrix.executable }} out/
+          PACKAGE_DIR="${{ env.APP_NAME }}-${{ matrix.platform }}"
+          mkdir -p "$PACKAGE_DIR"
+          cp -r public "$PACKAGE_DIR/public"
+          cp README.md "$PACKAGE_DIR/README.txt" || echo "No README.md found"
+          cp ${{ matrix.executable }} "$PACKAGE_DIR/"
 
           # Create version info
-          echo "SecureBank C++ Banking Application" > out/README.txt
-          echo "Version: $(date +%Y.%m.%d-%H%M%S)" >> out/README.txt
-          echo "Platform: ${{ matrix.platform }}" >> out/README.txt
-          echo "Built on: $(date)" >> out/README.txt
-          echo "" >> out/README.txt
-          echo "Usage:" >> out/README.txt
-          echo "1. Run the executable: ./${{ matrix.executable }}" >> out/README.txt
-          echo "2. Open browser to http://localhost:8080" >> out/README.txt
+          echo "SecureBank C++ Banking Application" > "$PACKAGE_DIR/README.txt"
+          echo "Version: $(date +%Y.%m.%d-%H%M%S)" >> "$PACKAGE_DIR/README.txt"
+          echo "Platform: ${{ matrix.platform }}" >> "$PACKAGE_DIR/README.txt"
+          echo "Built on: $(date)" >> "$PACKAGE_DIR/README.txt"
+          echo "" >> "$PACKAGE_DIR/README.txt"
+          echo "Usage:" >> "$PACKAGE_DIR/README.txt"
+          echo "1. Run the executable: ./${{ matrix.executable }}" >> "$PACKAGE_DIR/README.txt"
+          echo "2. Open browser to http://localhost:8080" >> "$PACKAGE_DIR/README.txt"
 
           # Create archive based on platform
           if [ "${{ matrix.platform }}" == "windows" ]; then
-            zip -r ${{ env.APP_NAME }}-${{ matrix.platform }}.zip out/*
+            zip -r "$PACKAGE_DIR.zip" "$PACKAGE_DIR"
           else
-            tar -czf ${{ env.APP_NAME }}-${{ matrix.platform }}.tar.gz -C out .
+            tar -czf "$PACKAGE_DIR.tar.gz" "$PACKAGE_DIR"
           fi
 
       - name: Upload build artifacts
@@ -147,7 +144,6 @@ jobs:
           retention-days: 30
 
   create-release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
