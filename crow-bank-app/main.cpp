@@ -929,7 +929,6 @@ string read_file(const string &filename)
 // Main CLI authentication menu
 void displayAuthMenu()
 {
-    cout << "Made with <3\n\n";
     cout << "==============================================\n";
     cout << "        " << getIcon("bank") << " SECURE BANK CLI SYSTEM        \n";
     cout << "==============================================\n";
@@ -945,7 +944,6 @@ void displayAuthMenu()
 // Banking dashboard menu (after login)
 void displayBankingMenu(const string &userName)
 {
-    cout << "Made with <3\n\n";
     cout << "==============================================\n";
     cout << "      " << getIcon("bank") << " WELCOME " << userName << "\n";
     cout << "==============================================\n";
@@ -1453,7 +1451,6 @@ void runCLI()
 
 void displayWelcomeScreen()
 {
-    cout << "Made with <3\n\n";
     cout << "========================================\n";
     cout << "         " << getIcon("bank") << " SECURE BANK SYSTEM         \n";
     cout << "========================================\n";
