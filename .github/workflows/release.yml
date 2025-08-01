@@ -3,17 +3,6 @@ name: Build and Release
 on:
   push:
     branches: [main]
-  workflow_dispatch: # Allow manual triggering
-    inputs:
-      release_type:
-        description: "Release type"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 env:
   APP_NAME: securebank
@@ -178,58 +167,9 @@ jobs:
           # Split version into major.minor.patch
           IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
 
-          # Determine release type
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # Manual trigger - use selected type
-            RELEASE_TYPE="${{ github.event.inputs.release_type }}"
-            echo "Manual release type: $RELEASE_TYPE"
-          else
-            # Automatic trigger - analyze commits since last release
-            echo "Analyzing commits for automatic version detection..."
-
-            # Get commits since last tag
-            if git describe --tags --abbrev=0 2>/dev/null; then
-              LAST_TAG=$(git describe --tags --abbrev=0)
-              COMMITS=$(git log ${LAST_TAG}..HEAD --oneline)
-            else
-              COMMITS=$(git log --oneline)
-            fi
-
-            echo "Commits to analyze:"
-            echo "$COMMITS"
-
-            # Check for breaking changes (major)
-            if echo "$COMMITS" | grep -E "(BREAKING CHANGE|!:)" > /dev/null; then
-              RELEASE_TYPE="major"
-              echo "🚨 Breaking changes detected → MAJOR release"
-            # Check for new features (minor)
-            elif echo "$COMMITS" | grep -E "^[a-f0-9]+ feat(\(.*\))?:" > /dev/null; then
-              RELEASE_TYPE="minor"
-              echo "✨ New features detected → MINOR release"
-            # Default to patch for fixes, docs, chore, etc.
-            else
-              RELEASE_TYPE="patch"
-              echo "🔧 Bug fixes/improvements detected → PATCH release"
-            fi
-          fi
-
-          echo "Final release type: $RELEASE_TYPE"
-
-          # Increment version based on type
-          case $RELEASE_TYPE in
-            major)
-              NEW_MAJOR=$((MAJOR + 1))
-              NEW_VERSION="$NEW_MAJOR.0.0"
-              ;;
-            minor)
-              NEW_MINOR=$((MINOR + 1))
-              NEW_VERSION="$MAJOR.$NEW_MINOR.0"
-              ;;
-            patch|*)
-              NEW_PATCH=$((PATCH + 1))
-              NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
-              ;;
-          esac
+          # Increment patch version for automatic releases
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
 
           echo "New version: v$NEW_VERSION"
           echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -248,62 +188,41 @@ jobs:
           done
           ls -la release-assets/
 
-      - name: Generate custom release notes
-        id: release_notes
-        run: |
-          # Get commits since last release
-          if git describe --tags --abbrev=0 2>/dev/null; then
-            LAST_TAG=$(git describe --tags --abbrev=0)
-            COMMITS=$(git log --oneline ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)")
-          else
-            COMMITS=$(git log --oneline --pretty=format:"- %s (%h)")
-          fi
-
-          # Create release notes
-          cat << EOF > release_notes.md
-          # SecureBank C++ Banking Application ${{ steps.version.outputs.version }}
-
-          ## 🚀 What's New
-          ${COMMITS}
-
-          ## 📦 Downloads
-          - **🐧 Linux:** [securebank-linux.tar.gz](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-linux.tar.gz) — Extract and run \`./crow_bank_app\`
-          - **🪟 Windows:** [securebank-windows.zip](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-windows.zip) — Extract and run \`crow_bank_app.exe\`
-
-          ## 🛠️ Quick Start
-          \`\`\`sh
-          # Linux
-          tar -xzf securebank-linux.tar.gz && cd securebank-linux/
-          ./crow_bank_app
-
-          # Windows - Extract zip file then:
-          crow_bank_app.exe
-          \`\`\`
-          Open your browser to [http://localhost:8080](http://localhost:8080)
-
-          ## 🔧 System Requirements
-          - **Linux:** Ubuntu 18.04+ or equivalent, 64-bit
-          - **Windows:** Windows 10+ or Windows Server 2019+, 64-bit
-          - **Memory:** 512MB RAM minimum
-          - **Storage:** 50MB free space
-
-          ---
-          *For major releases and new features, see our [release history](https://github.com/${{ github.repository }}/releases).*
-          EOF
-
-          echo "Generated release notes:"
-          cat release_notes.md
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
           name: SecureBank ${{ steps.version.outputs.version }}
-          body_path: release_notes.md
+          body: |
+            # SecureBank C++ Banking Application ${{ steps.version.outputs.version }}
+
+            ## 📦 Downloads
+            - **🐧 Linux:** [securebank-linux.tar.gz](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-linux.tar.gz) — Extract and run `./crow_bank_app`
+            - **🪟 Windows:** [securebank-windows.zip](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/securebank-windows.zip) — Extract and run `crow_bank_app.exe`
+
+            ## 🛠️ Quick Start
+            ```sh
+            # Linux
+            tar -xzf securebank-linux.tar.gz && cd securebank-linux/
+            ./crow_bank_app
+
+            # Windows - Extract zip file then:
+            crow_bank_app.exe
+            ```
+            Open your browser to [http://localhost:8080](http://localhost:8080)
+
+            ## 🔧 System Requirements
+            - **Linux:** Ubuntu 18.04+ or equivalent, 64-bit
+            - **Windows:** Windows 10+ or Windows Server 2019+, 64-bit
+            - **Memory:** 512MB RAM minimum
+            - **Storage:** 50MB free space
+
+            ---
+            *For major releases and new features, see our [release history](https://github.com/ITx-prash/securebank-cpp/releases).*
           files: release-assets/*
           draft: false
           prerelease: false
-          generate_release_notes: false
+          generate_release_notes: true
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
