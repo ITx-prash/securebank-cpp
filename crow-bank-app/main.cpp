@@ -341,99 +341,38 @@ string get_file_path(const string &relative_path)
 string getIcon(const string &iconType)
 {
 #ifdef _WIN32
-    // Windows - Smart emoji detection
-    // Check for Windows Terminal or modern terminal capabilities
-    static bool useEmojis = []()
-    {
-        // Check environment variables that indicate modern terminal
-        const char *wt_session = getenv("WT_SESSION");     // Windows Terminal
-        const char *term_program = getenv("TERM_PROGRAM"); // VS Code terminal, etc.
-        const char *colorterm = getenv("COLORTERM");       // Modern terminals
-        const char *force_emojis = getenv("FORCE_EMOJIS"); // User override
-        const char *no_emojis = getenv("NO_EMOJIS");       // User disable
-
-        // User explicitly disabled emojis
-        if (no_emojis)
-            return false;
-
-        // User explicitly enabled emojis
-        if (force_emojis)
-            return true;
-
-        // Detect modern terminal environment
-        return (wt_session || term_program || colorterm);
-    }();
-
-    if (useEmojis)
-    {
-        // Unicode emojis for modern Windows terminals
-        if (iconType == "bank")
-            return "🏦";
-        if (iconType == "register")
-            return "📝";
-        if (iconType == "login")
-            return "🔐";
-        if (iconType == "help")
-            return "❓";
-        if (iconType == "exit")
-            return "🚪";
-        if (iconType == "deposit")
-            return "💰";
-        if (iconType == "withdraw")
-            return "💸";
-        if (iconType == "balance")
-            return "💳";
-        if (iconType == "history")
-            return "📊";
-        if (iconType == "transfer")
-            return "🔄";
-        if (iconType == "settings")
-            return "⚙️";
-        if (iconType == "logout")
-            return "🚪";
-        if (iconType == "success")
-            return "✅";
-        if (iconType == "error")
-            return "❌";
-        if (iconType == "warning")
-            return "⚠️";
-        return "•";
-    }
-    else
-    {
-        // Windows fallback - basic ASCII characters only
-        if (iconType == "bank")
-            return "";
-        if (iconType == "register")
-            return "";
-        if (iconType == "login")
-            return "";
-        if (iconType == "help")
-            return "";
-        if (iconType == "exit")
-            return "";
-        if (iconType == "deposit")
-            return "";
-        if (iconType == "withdraw")
-            return "";
-        if (iconType == "balance")
-            return "";
-        if (iconType == "history")
-            return "";
-        if (iconType == "transfer")
-            return "";
-        if (iconType == "settings")
-            return "";
-        if (iconType == "logout")
-            return "";
-        if (iconType == "success")
-            return "[OK]";
-        if (iconType == "error")
-            return "[ERROR]";
-        if (iconType == "warning")
-            return "[WARNING]";
+    // Windows - Clean text without icons for better appearance
+    if (iconType == "bank")
         return "";
-    }
+    if (iconType == "register")
+        return "";
+    if (iconType == "login")
+        return "";
+    if (iconType == "help")
+        return "";
+    if (iconType == "exit")
+        return "";
+    if (iconType == "deposit")
+        return "";
+    if (iconType == "withdraw")
+        return "";
+    if (iconType == "balance")
+        return "";
+    if (iconType == "history")
+        return "";
+    if (iconType == "transfer")
+        return "";
+    if (iconType == "settings")
+        return "";
+    if (iconType == "logout")
+        return "";
+    if (iconType == "success")
+        return "[SUCCESS]";
+    if (iconType == "error")
+        return "[ERROR]";
+    if (iconType == "warning")
+        return "[WARNING]";
+    return "";
 #else
     // Linux/Unix - Unicode emojis
     if (iconType == "bank")
@@ -1552,7 +1491,7 @@ int main(int argc, char *argv[])
         case 3:
         { // Exit
             clearScreen();
-            cout << "\n� Thank you for exploring SecureBank!\n";
+            cout << "\n" << getIcon("exit") << " Thank you for exploring SecureBank!\n";
 
             return 0;
         }
