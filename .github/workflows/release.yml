@@ -3,6 +3,9 @@ name: Build and Release
 on:
   push:
     branches: [main]
+    paths:
+      - "crow-bank-app/**"
+      - ".github/workflows/release.yml"
 
 env:
   APP_NAME: securebank
